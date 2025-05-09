@@ -21,7 +21,14 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
 
   // You can expose other APTs you need here.
   // ...
+
 })
+
+contextBridge.exposeInMainWorld('electronAPI', {
+  setLogPath: (path: string) => ipcRenderer.invoke('set-log-path', path),
+  onLogUpdate: (callback: (line: string) => void) =>
+    ipcRenderer.on('log-updated', (_event, line) => callback(line)),
+});
 
 // --------- Preload scripts loading ---------
 function domReady(condition: DocumentReadyState[] = ['complete', 'interactive']) {

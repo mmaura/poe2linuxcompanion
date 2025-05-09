@@ -9,4 +9,8 @@ declare module '*.vue' {
 interface Window {
   // expose in the `electron/preload/index.ts`
   ipcRenderer: import('electron').IpcRenderer
+  electronAPI: {
+    setLogPath: (path: string) => Promise<void>;
+    onLogUpdate: (callback: (line: string) => void)=> void;
+  };
 }

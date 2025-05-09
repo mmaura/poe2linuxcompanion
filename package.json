@@ -1,17 +1,16 @@
 {
-  "name": "electron-vue-vite",
-  "version": "28.1.0",
+  "name": "poe2-linux-companion",
+  "version": "0.1",
   "main": "dist-electron/main/index.js",
-  "description": "Really simple Electron + Vue + Vite boilerplate.",
-  "author": "草鞋没号 <308487730@qq.com>",
+  "description": "Un companioon pour poe2 sous linux",
+  "author": "Mathieu MAURA <mmaura66@gmail.com>",
   "license": "MIT",
   "private": true,
   "keywords": [
     "electron",
-    "rollup",
-    "vite",
-    "vue3",
-    "vue"
+    "poe2",
+    "path of exile 2",
+    "linux"
   ],
   "debug": {
     "env": {
@@ -26,7 +25,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
-    "electron": "^29.1.1",
+    "electron": "^36.2.0",
     "electron-builder": "^24.13.3",
     "typescript": "^5.4.2",
     "vite": "^5.1.5",
