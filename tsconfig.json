@@ -13,7 +13,7 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["src"],
+  "include": ["src", "src/window-main/App.vue", "src/window-config/Config.vue", "packasrc/window-main/main.ts"],
   "references": [
     { "path": "./tsconfig.node.json" }
   ]

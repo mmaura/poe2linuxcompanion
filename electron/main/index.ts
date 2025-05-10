@@ -28,8 +28,8 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 
 const preload = path.join(__dirname, '../preload/index.mjs')
 //const preload = path.join(__dirname, '../preload/index.ts')
-const indexHtml = path.join(RENDERER_DIST, 'index.html')
-
+const MainWinindexHtml = path.join(RENDERER_DIST, 'main/index.html') // a tester en build
+//const MainWinindexHtml = path.join(RENDERER_DIST, 'window-main/index.html')
 
 // Disable GPU Acceleration for Windows 7
 if (os.release().startsWith('6.1')) app.disableHardwareAcceleration()
@@ -48,10 +48,10 @@ if (!app.requestSingleInstanceLock()) {
 /*
 * Main Window
 */
-let mainWindow: BrowserWindow | null = null
+let MainWindow: BrowserWindow | null = null
 
 async function createWindow() {
-  mainWindow = new BrowserWindow({
+  MainWindow = new BrowserWindow({
     title: 'POE2 Linux Companion - Loading',
     icon: path.join(process.env.VITE_PUBLIC, 'favicon.ico'),
     webPreferences: {
@@ -64,7 +64,7 @@ async function createWindow() {
       // contextIsolation: false,
     },
     transparent: false,
-    frame: false,
+    frame: true,
     width: 400,
     height: 400,
     resizable: false,
@@ -75,25 +75,30 @@ async function createWindow() {
   })
 
   if (VITE_DEV_SERVER_URL) { // #298
-    mainWindow.loadURL(VITE_DEV_SERVER_URL)
+    console.log(`===>> ${VITE_DEV_SERVER_URL}src/window-main/index.html`)
+
+    MainWindow.loadURL(`${VITE_DEV_SERVER_URL}src/window-main/index.html`)
     // Open devTool if the app is not packaged
-    mainWindow.webContents.openDevTools()
+    MainWindow.webContents.openDevTools()
   } else {
-    
-    mainWindow.loadFile(indexHtml)
+    MainWindow.loadFile(MainWinindexHtml)
   }
 
   // Test actively push message to the Electron-Renderer
-  mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow?.webContents.send('main-process-message', new Date().toLocaleString())
+  MainWindow.webContents.on('did-finish-load', () => {
+    MainWindow?.webContents.send('main-process-message', new Date().toLocaleString())
   })
 
   // Make all links open with the browser, not with the application
-  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+  MainWindow.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith('https:')) shell.openExternal(url)
     return { action: 'deny' }
   })
   // win.webContents.on('will-navigate', (event, url) => { }) #344
+
+  MainWindow.on('close', ()=>{
+    app.quit();
+  })
 }
 
 app.whenReady().then(()=>{
@@ -101,18 +106,21 @@ app.whenReady().then(()=>{
   createWindow();
 })
 
-app.on('window-all-closed', () => {
-  await StopSocket();
-  mainWindow = null
+app.on('will-quit', () => {
+  console.log('**** will quit');
+  StopSocket();
+  ConfigWindow = null
+  MainWindow = null
   if (process.platform !== 'darwin') app.quit()
 })
 
+
 app.on('second-instance', () => {
   console.log('second');
-  if (mainWindow) {
+  if (MainWindow) {
     // Focus on the main window if the user tried to open another
-    if (mainWindow.isMinimized()) mainWindow.restore()
-    mainWindow.focus()
+    if (MainWindow.isMinimized()) MainWindow.restore()
+    MainWindow.focus()
   }
 })
 
@@ -125,19 +133,52 @@ app.on('activate', () => {
   }
 })
 
-// New window example arg: new windows url
-ipcMain.handle('open-win', (_, arg) => {
-  const childWindow = new BrowserWindow({
+/**
+ * Config Window
+ */
+let ConfigWindow :BrowserWindow = null
+const ConfigWinindexHtml = path.join(RENDERER_DIST, 'config/index.html')
+
+ipcMain.handle('open-config-window', (_, arg) => {
+  console.log("*** main ***")
+  console.log(arg);
+
+  if (ConfigWindow) {
+    ConfigWindow.focus()
+  }
+  else{
+    createConfigWindow();
+  }
+});
+
+
+function createConfigWindow(){
+  ConfigWindow = new BrowserWindow({
     webPreferences: {
       preload,
-      nodeIntegration: true,
-      contextIsolation: false,
+      //nodeIntegration: true,
+      //contextIsolation: false,
     },
+    transparent: false,
+    frame: false,
+    width: 400,
+    height: 400,
+    resizable: true,
+    movable: true,
+    center: true,
+    show: true,
+    alwaysOnTop: false
   })
 
+
+  /**
+   * Ne fonctionne pas, affiche le contenue de App.vue à la place de compnents/Config.vue
+   */
   if (VITE_DEV_SERVER_URL) {
-    childWindow.loadURL(`${VITE_DEV_SERVER_URL}#${arg}`)
+    console.log(`===>> ${VITE_DEV_SERVER_URL}src/window-config/index.html`)
+    ConfigWindow.loadURL(`${VITE_DEV_SERVER_URL}src/window-config/index.html`);
   } else {
-    childWindow.loadFile(indexHtml, { hash: arg })
+    ConfigWindow.loadFile(ConfigWinindexHtml);
+    ConfigWindow.webContents.openDevTools()
   }
-})
+}

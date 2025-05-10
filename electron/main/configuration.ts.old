@@ -1,0 +1,64 @@
+import { BrowserWindow, ipcMain } from 'electron'
+import { createRequire } from 'node:module'
+import { fileURLToPath } from 'node:url'
+
+import path from 'path'
+
+const require = createRequire(import.meta.url)
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+process.env.APP_ROOT = path.join(__dirname, '../..')
+
+export const MAIN_DIST = path.join(process.env.APP_ROOT, 'dist-electron')
+export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
+export const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL
+
+process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
+  ? path.join(process.env.APP_ROOT, 'public')
+  : RENDERER_DIST
+
+const preload = path.join(__dirname, '../preload/index.mjs')
+//const preload = path.join(__dirname, '../preload/index.ts')
+const indexHtml = path.join(RENDERER_DIST, 'index.html')
+
+
+let ConfigWindow: BrowserWindow | null = null
+
+ipcMain.handle('open-config-window-non', () => {
+  if (ConfigWindow) {
+    ConfigWindow.focus()
+  }
+  else{
+    createConfigWindow();
+  }
+});
+
+function createConfigWindow(){
+  ConfigWindow = new BrowserWindow({
+    width: 500,
+    height: 400,
+    title: 'Configuration',
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'), // si tu as un preload
+      contextIsolation: true,
+      nodeIntegration: false,
+    }
+  })
+
+  ConfigWindow.loadURL('http://localhost:5173/config') // ou fichier HTML/URL selon dev/prod
+  if (VITE_DEV_SERVER_URL) { // #298
+    ConfigWindow.loadURL(VITE_DEV_SERVER_URL)
+    // Open devTool if the app is not packaged
+    ConfigWindow.webContents.openDevTools()
+  } else {
+    
+    ConfigWindow.loadFile(indexHtml)
+  }
+
+  ConfigWindow.on('closed', () => {
+    ConfigWindow = null
+  })
+}
+
+
+

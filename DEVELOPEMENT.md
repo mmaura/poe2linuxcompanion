@@ -44,3 +44,9 @@ nvm use lts/iron
 code
 ```
 
+
+
+# Communiquer par la socket 
+```
+echo "test" | socat - UNIX-CONNECT:/run/user/1000/poe2linuxcompanion.socket
+```

@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import electron from 'vite-plugin-electron/simple'
 import pkg from './package.json'
+import { resolve } from 'node:path'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
@@ -26,6 +27,7 @@ export default defineConfig(({ command }) => {
               startup()
             }
           },
+          // 👉 https://vitejs.dev/guide/api-javascript.html#inlineconfig
           vite: {
             build: {
               sourcemap,
@@ -60,15 +62,34 @@ export default defineConfig(({ command }) => {
         // If you want use Node.js in Renderer process, the `nodeIntegration` needs to be enabled in the Main process.
         // See 👉 https://github.com/electron-vite/vite-plugin-electron-renderer
         renderer: {},
+        
       }),
     ],
     server: process.env.VSCODE_DEBUG && (() => {
       const url = new URL(pkg.debug.env.VITE_DEV_SERVER_URL)
+      console.log(`*******${url}`);
       return {
         host: url.hostname,
         port: +url.port,
       }
     })(),
     clearScreen: false,
+    build: {
+      rollupOptions: {
+        input: {
+          main: resolve(__dirname, 'src/window-main/index.html'),
+          config: resolve(__dirname, 'src/window-config/index.html')
+        },
+        output: {
+          // Cela crée des sous-dossiers selon les clés (main, config)
+          // dist/main/index.html et dist/config/index.html
+          entryFileNames: '[name]/assets/[name].[hash].js',
+          chunkFileNames: '[name]/assets/[name].[hash].js',
+          assetFileNames: '[name]/assets/[name].[hash].[ext]',
+        },
+      },
+    },
+    outDir: 'dist',
+    emptyOutDir: true
   }
 })

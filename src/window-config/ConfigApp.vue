@@ -1,15 +1,22 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
+
+
+onMounted(() => {
+
+});
+
 </script>
 
 <template>
-    <img src="/logo.svg" alt="Logo">
+  <div>Config</div>
 </template>
 
 <style>
   body {
       margin: 0;
       padding: 0;
-      background-color: transparent; /* Assurez-vous que le fond est transparent */
+      background-color: white;
       display: flex;
       justify-content: center;
       align-items: center;
