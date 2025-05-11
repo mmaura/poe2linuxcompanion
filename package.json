@@ -24,14 +24,20 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@types/lodash.debounce": "^4.0.9",
     "@vitejs/plugin-vue": "^5.0.4",
     "electron": "^36.2.0",
     "electron-builder": "^24.13.3",
+    "electron-store": "^8.2.0",
+    "lodash.debounce": "^4.0.8",
     "typescript": "^5.4.2",
     "vite": "^5.1.5",
     "vite-plugin-electron": "^0.28.4",
     "vite-plugin-electron-renderer": "^0.14.5",
     "vue": "^3.4.21",
     "vue-tsc": "^2.0.6"
+  },
+  "dependencies": {
+    "chokidar": "^4.0.3"
   }
 }
