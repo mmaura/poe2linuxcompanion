@@ -15,13 +15,16 @@ import {
   RENDERER_DIST,
   VITE_DEV_SERVER_URL,
   __dirname,
+  getAbsPackagedPath,
 } from './utils';
 import path from 'node:path';
 import os from 'node:os';
+import fs from 'node:fs';
 
 import { Setup as configSetup } from './components/configuration';
 import { Setup as socketSetup } from './components/socket';
 import { Setup as clientlogSetup } from './components/clientlog';
+import { Setup as pricecheckSetup } from './components/pricecheck';
 import AppStorage from './components/storage';
 
 console.log("** c'est parti **");
@@ -113,6 +116,12 @@ async function CreateMainWindow() {
 }
 
 app.whenReady().then(() => {
+  // if (fs.existsSync(AppIconFile)) console.log('icon existe');
+  // else {
+  //   console.log(`"icone n'existe pas : ${AppIconFile}"`);
+  //   lsRecursive(process.resourcesPath);
+  // }
+  pricecheckSetup();
   configSetup();
   socketSetup();
   clientlogSetup();
@@ -124,6 +133,28 @@ app.whenReady().then(() => {
     appRegisterShorcuts();
   });
 });
+
+// function lsRecursive(dirPath) {
+//   // Lire le contenu du répertoire
+//   const files = fs.readdirSync(dirPath);
+
+//   // Parcourir chaque fichier/répertoire
+//   files.forEach((file) => {
+//     const fullPath = path.join(dirPath, file);
+
+//     // Obtenir les informations sur le fichier/répertoire
+//     const stats = fs.statSync(fullPath);
+
+//     if (stats.isDirectory()) {
+//       // Si c'est un répertoire, afficher son nom et explorer récursivement
+//       console.log(`Répertoire: ${fullPath}`);
+//       lsRecursive(fullPath);
+//     } else {
+//       // Si c'est un fichier, afficher son nom
+//       console.log(`Fichier: ${fullPath}`);
+//     }
+//   });
+// }
 
 app.on('will-quit', () => {
   globalShortcut.unregisterAll();

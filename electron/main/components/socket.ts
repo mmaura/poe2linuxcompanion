@@ -19,12 +19,18 @@ export async function Setup(
   server = net.createServer((stream) => {
     stream.on('data', (data) => {
       //TODO: traiter les messages recu sur la socket
-      const command = data.toString().replace('\n', '').split(' ');
+      const command = data.toString().split('\n');
 
       switch (command[0]) {
         case 'show-config':
           ipcMain.emit('configuration-show-window');
           break;
+        case 'pricecheck':
+          console.log('pricecheck');
+          ipcMain.emit('pricecheck-checkitem', ...command);
+          break;
+        default:
+          console.log('commande inconnue');
       }
     });
 

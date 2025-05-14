@@ -121,6 +121,10 @@ window.onmessage = (ev) => {
   ev.data.payload === 'removeLoading' && removeLoading();
 };
 
+ipcRenderer.on('removeLoading', () => {
+  removeLoading();
+});
+
 setTimeout(removeLoading, 4999);
 
 /**

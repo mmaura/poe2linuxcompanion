@@ -1,0 +1,15 @@
+2025/04/27 17:13:12 11204948 3ef23365 [INFO Client 540] @De WitchandWarriorSuck: Bonjour, je souhaiterais t'acheter  Tranchant géniteur, Lance barbelée pour 1 exalted dans la ligue Dawn of the Hunt (onglet de réserve "~price 1 exalted" ; 1e en partant de la gauche, 1e en partant du haut)
+2025/04/27 18:44:24 16676938 3ef23365 [INFO Client 540] @De 모래요뎡: Bonjour, je souhaiterais t'acheter Les trois Dragons, Masque solide pour 1 exalted dans la ligue Dawn of the Hunt (onglet de réserve "~price 1 exalted" ; 1e en partant de la gauche, 7e en partant du haut)
+2025/04/27 19:14:10 18463420 3ef23365 [INFO Client 540] @De YurrtLandrin: Bonjour, je souhaiterais t'acheter Sceptre sanctuaire pour 1 regal dans la ligue Dawn of the Hunt (onglet de réserve "~price 1 regal" ; 6e en partant de la gauche, 7e en partant du haut)
+2025/04/27 19:33:16 19609496 3ef23365 [INFO Client 540] @De JeffBezosCosplayed: Bonjour, je souhaiterais t'acheter Sceptre sanctuaire pour 1 regal dans la ligue Dawn of the Hunt (onglet de réserve "~price 1 regal" ; 6e en partant de la gauche, 7e en partant du haut)
+2025/04/27 19:35:43 19756025 3ef23365 [INFO Client 540] @De JeffBezosCosplayed: Bonjour, je souhaiterais t'acheter Sceptre sanctuaire pour 1 regal dans la ligue Dawn of the Hunt (onglet de réserve "~price 1 regal" ; 6e en partant de la gauche, 7e en partant du haut)
+2025/04/28 20:31:25 10646494 3ef23365 [INFO Client 204] @À shankleroux: Bonjour, je souhaiterais t'acheter  Laisse venteuse, Ceinture lourde pour 1 exalted dans la ligue Dawn of the Hunt (onglet de réserve "~price 1 exalted" ; 1e en partant de la gauche, 2e en partant du haut)
+2025/04/28 20:57:04 12185395 3ef23365 [INFO Client 204] @De Marmaladeeee: Bonjour, je souhaiterais t'acheter Sceptre sanctuaire pour 1 regal dans la ligue Dawn of the Hunt (onglet de réserve "~price 1 regal" ; 6e en partant de la gauche, 7e en partant du haut)
+2025/04/28 21:05:49 12710302 3ef23365 [INFO Client 204] @De B_zzzz: Bonjour, je souhaiterais t'acheter La Sentinelle, Bâton de combat gothique pour 1 alch dans la ligue Dawn of the Hunt (onglet de réserve "V1" ; 3e en partant de la gauche, 1e en partant du haut)
+2025/05/01 16:05:12 311884 3ef23365 [INFO Client 188] @De JohnCraig: Bonjour, je souhaiterais t'acheter La Sentinelle, Bâton de combat gothique pour 1 alch dans la ligue Dawn of the Hunt (onglet de réserve "V1" ; 3e en partant de la gauche, 1e en partant du haut)
+2025/05/01 16:05:33 332799 3ef23365 [INFO Client 188] : JohnCraig a rejoint la zone.
+2025/05/01 16:05:52 351965 3ef23365 [INFO Client 188] : Échange annulé.
+2025/05/01 16:06:07 366893 3ef23365 [INFO Client 188] : Échange accepté.
+2025/05/01 16:06:13 373181 3ef23365 [INFO Client 188] @À JohnCraig: thx
+2025/05/01 16:06:20 380448 3ef23365 [INFO Client 188] @À Raiyndra: sold
+2025/05/01 16:06:24 384678 3ef23365 [INFO Client 188] : JohnCraig a quitté la zone.

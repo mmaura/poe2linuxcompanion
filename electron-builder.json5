@@ -30,6 +30,7 @@
   linux: {
     target: ['AppImage'],
     artifactName: '${productName}-Linux-${version}.${ext}',
-    icon: 'electron/public/icon.png',
+    category: 'Game',
+    icon: 'dist/logo.png',
   },
 }
