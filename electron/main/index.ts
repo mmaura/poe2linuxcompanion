@@ -5,6 +5,7 @@ import {
   ipcMain,
   dialog,
   nativeImage,
+  globalShortcut,
 } from 'electron';
 
 import { CreateTray } from './tray';
@@ -21,6 +22,7 @@ import os from 'node:os';
 import { Setup as configSetup } from './components/configuration';
 import { Setup as socketSetup } from './components/socket';
 import { Setup as clientlogSetup } from './components/clientlog';
+import AppStorage from './components/storage';
 
 console.log("** c'est parti **");
 console.log('PID: %s', process.pid);
@@ -52,7 +54,6 @@ if (!app.requestSingleInstanceLock()) {
  * Main Window
  */
 let MainWindow: BrowserWindow | null = null;
-const MainWinindexHtml = path.join(RENDERER_DIST, 'main/index.html');
 
 async function CreateMainWindow() {
   MainWindow = new BrowserWindow({
@@ -89,7 +90,9 @@ async function CreateMainWindow() {
     MainWindow.loadURL(`${VITE_DEV_SERVER_URL}src/window-main/index.html`);
     //MainWindow.webContents.openDevTools()
   } else {
-    MainWindow.loadFile(MainWinindexHtml);
+    MainWindow.loadFile(path.join(RENDERER_DIST, 'src/window-main/index.html'));
+    //    MainWindow.loadFile(path.join(__dirname, '../../dist/main/index.html'));
+    //console.log(path.join(__dirname, '../../dist/main/index.html'));
   }
 
   // Test actively push message to the Electron-Renderer
@@ -115,9 +118,15 @@ app.whenReady().then(() => {
   clientlogSetup();
   CreateTray();
   CreateMainWindow();
+  appRegisterShorcuts();
+
+  AppStorage.onDidChange('hotkeys', () => {
+    appRegisterShorcuts();
+  });
 });
 
 app.on('will-quit', () => {
+  globalShortcut.unregisterAll();
   MainWindow = null;
   if (process.platform !== 'darwin') app.quit();
 });
@@ -155,4 +164,20 @@ async function OpenFileDialog(event, ...arg: string[]) {
   if (!canceled) {
     return filePaths[0];
   }
+}
+
+async function appRegisterShorcuts() {
+  globalShortcut.unregisterAll();
+
+  if (
+    globalShortcut.register(AppStorage.get('hotkeys.pricecheck'), () => {
+      ipcMain.emit('shortcut-pricecheck');
+      console.log('pricecheck is pressed');
+    })
+  ) {
+    console.log(`enregistrement réussi`);
+  } else console.log('enregistrement échoué');
+
+  // Check si le raccourci est enregistré.
+  console.log(globalShortcut.isRegistered('CommandOrControl+X'));
 }

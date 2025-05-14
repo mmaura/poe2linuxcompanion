@@ -1,6 +1,6 @@
 {
   "name": "poe2-linux-companion",
-  "version": "0.1",
+  "version": "0.0.1",
   "main": "dist-electron/main/index.js",
   "description": "Un companioon pour poe2 sous linux",
   "author": "Mathieu MAURA <mmaura66@gmail.com>",
@@ -38,6 +38,7 @@
     "vue-tsc": "^2.0.6"
   },
   "dependencies": {
+    "asar": "^3.2.0",
     "chokidar": "^4.0.3"
   }
 }

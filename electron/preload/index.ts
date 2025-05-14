@@ -135,9 +135,28 @@ contextBridge.exposeInMainWorld('configuration', {
   sendPoe2LogFilePath: (path: any) =>
     ipcRenderer.send('configuration-receivePoe2LogFilePath', path),
 
+  sendSidekickURL: (url: string) => {
+    ipcRenderer.send('configuration-receiveSidekickURL', url);
+  },
+  sendPoe2RunAtStart: (run: boolean) => {
+    ipcRenderer.send('configuration-receivePoe2RunAtStart', run);
+  },
+
   getPoe2LogFile: () => {
     return ipcRenderer.invoke('configuration-sendPoe2LogFilePath');
   },
+  getSidekickURL: () => {
+    return ipcRenderer.invoke('configuration-sendSidekickURL');
+  },
+  getPricecheckShortcut: () => {
+    return ipcRenderer.invoke('configuration-sendPricecheckShortcut');
+  },
+  getPoe2RunAtStart: () => {
+    return ipcRenderer.invoke('configuration-sendPoe2RunAtStart');
+  },
+
+  saveHotkey: (hotkey: string, feature: string) =>
+    ipcRenderer.send('configuration-save-hotkey', hotkey, feature),
 });
 
 /**

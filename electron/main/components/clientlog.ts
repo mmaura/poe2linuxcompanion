@@ -54,7 +54,9 @@ function ShowWindow() {
       );
       Window.loadURL(`${VITE_DEV_SERVER_URL}src/window-clientlog/index.html`);
     } else {
-      Window.loadFile(path.join(RENDERER_DIST, 'clientlog/index.html'));
+      Window.loadFile(
+        path.join(RENDERER_DIST, 'src/window-clientlog/index.html')
+      );
       Window.webContents.openDevTools();
     }
   }

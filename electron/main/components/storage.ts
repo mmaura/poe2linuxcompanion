@@ -5,6 +5,20 @@ import os from 'node:os';
 
 type ConfigSchema = {
   poe2LogFilePath: string;
+  sidekickURL: string;
+  poe2CmdLine: string;
+  Poe2RunAtStart: boolean;
+  hotkeys: {
+    type: 'object';
+    properties: {
+      pricecheck: { type: 'string'; default: 'Ctrl+Alt+D' };
+      reload_logs: { type: 'string'; default: 'Ctrl+Alt+R' };
+    };
+    default: {
+      pricecheck: 'Ctrl+Alt+D';
+      reload_logs: 'Ctrl+Alt+R';
+    };
+  };
 };
 
 const configSchema: Schema<ConfigSchema> = {
@@ -21,6 +35,27 @@ const configSchema: Schema<ConfigSchema> = {
       'logs',
       'Client.txt'
     ),
+  },
+  poe2CmdLine: {
+    type: 'string',
+    default: 'env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/6',
+  },
+  Poe2RunAtStart: {
+    type: 'boolean',
+    default: false,
+  },
+  sidekickURL: {
+    type: 'string',
+    default: 'http://127.0.0.1:5000',
+  },
+  hotkeys: {
+    type: 'object',
+    properties: {
+      pricecheck: {
+        type: 'string',
+        default: 'Control+Alt+d',
+      },
+    },
   },
 };
 

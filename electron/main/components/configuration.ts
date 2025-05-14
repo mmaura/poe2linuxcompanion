@@ -29,14 +29,37 @@ export async function Setup() {
 
   ipcMain.on('configuration-receivePoe2LogFilePath', (event, newPath) => {
     if (newPath && fs.existsSync(newPath)) {
-      console.log('Fichier de log POE2 mis à jour :', newPath);
       AppStorage.set('poe2LogFilePath', newPath);
     }
   });
 
+  ipcMain.on('configuration-receiveSidekickURL', (_, url) => {
+    AppStorage.set('sidekickURL', url);
+  });
+
+  ipcMain.on('configuration-receivePoe2RunAtStart', (_, run) => {
+    AppStorage.set('Poe2RunAtStart', run);
+  });
+
+  ipcMain.handle('configuration-sendPoe2RunAtStart', () => {
+    return AppStorage.get('Poe2RunAtStart');
+  });
+
   ipcMain.handle('configuration-sendPoe2LogFilePath', () => {
-    console.log('get: ', AppStorage.get('poe2LogFilePath'));
     return AppStorage.get('poe2LogFilePath');
+  });
+
+  ipcMain.handle('configuration-sendSidekickURL', () => {
+    return AppStorage.get('sidekickURL');
+  });
+
+  ipcMain.handle('configuration-sendPricecheckShortcut', () => {
+    return AppStorage.get('hotkeys.pricecheck');
+  });
+
+  ipcMain.on('configuration-save-hotkey', (_, hotkey, feature) => {
+    console.log(`hotkeys.${feature} : ${hotkey}`);
+    AppStorage.set(`hotkeys.${feature}`, hotkey);
   });
 }
 
@@ -74,8 +97,8 @@ async function CreateConfigWindow() {
     },
     transparent: false,
     frame: true,
-    width: 400,
-    height: 400,
+    width: 1200,
+    height: 800,
     resizable: true,
     movable: true,
     center: true,
@@ -91,7 +114,7 @@ async function CreateConfigWindow() {
     console.log(`===>> ${VITE_DEV_SERVER_URL}src/window-config/index.html`);
     Window.loadURL(`${VITE_DEV_SERVER_URL}src/window-config/index.html`);
   } else {
-    Window.loadFile(path.join(RENDERER_DIST, 'config/index.html'));
+    Window.loadFile(path.join(RENDERER_DIST, 'src/window-config/index.html'));
     Window.webContents.openDevTools();
   }
 }

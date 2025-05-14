@@ -13,8 +13,16 @@ interface Window {
   configuration: {
     ShowPoe2logFileDialog: (path: string) => Promise<string>;
     ShowWindow: () => void;
-    sendPoe2LogFilePath: (path: any) => void;
+
+    saveHotkey: (hotkey: string, feature: string) => void;
+    sendPoe2LogFilePath: (path: string) => void;
+    sendSidekickURL: (url: string) => void;
+    sendPoe2RunAtStart: (run: boolean) => void;
+
+    getPoe2RunAtStart: () => boolean;
     getPoe2LogFile: () => string;
+    getSidekickURL: () => string;
+    getPricecheckShortcut: () => string;
   };
 
   clientlog: {

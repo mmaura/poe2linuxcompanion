@@ -12,10 +12,16 @@
   "editor.detectIndentation": false,
   // N'empêche pas '.' d'ouvrir les suggestions, mais évite qu'il valide une suggestion
   "editor.acceptSuggestionOnCommitCharacter": false,
-
   // N'accepte les suggestions que quand tu appuies sur Enter
   "editor.acceptSuggestionOnEnter": "on",
-
   // Facultatif : empêche Tab de valider les suggestions
-  "editor.tabCompletion": "off"
+  "editor.tabCompletion": "off",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }  
 }
