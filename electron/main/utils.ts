@@ -12,18 +12,7 @@ export const MAIN_DIST = path.join(process.env.APP_ROOT, 'dist-electron');
 export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist');
 export const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
 
-export const AppIconFile = getAbsPackagedPath('logo.png');
-//export const AppIconFile = path.join(app.getAppPath(), 'logo.png');
-
-// export function getIconFilePath() {
-//   if (VITE_DEV_SERVER_URL) {
-//     console.log(app.getAppPath());
-//     return '/logo.png';
-//   } else {
-//     console.log(app.getAppPath());
-//     return app.getAppPath();
-//   }
-// }
+export const AppIconFile = getRessourcesPath('logo.png');
 
 export const PRELOAD = path.join(__dirname, '../preload/index.mjs');
 
@@ -37,9 +26,9 @@ export const Lang = app.getLocaleCountryCode().toLowerCase();
  *
  * @returns the base absolute path of the packaged assets files
  */
-export function getAbsPackagedPath(...arg): string {
+export function getRessourcesPath(...arg): string {
   console.log(`apppath : `, app.getAppPath());
   return app.isPackaged
     ? path.resolve(path.join(app.getAppPath(), 'dist', ...arg))
-    : path.resolve(path.join(app.getAppPath(), 'dist', ...arg));
+    : path.resolve(path.join(app.getAppPath(), 'public', ...arg));
 }

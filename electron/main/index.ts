@@ -1,12 +1,4 @@
-import {
-  app,
-  BrowserWindow,
-  shell,
-  ipcMain,
-  dialog,
-  nativeImage,
-  globalShortcut,
-} from 'electron';
+import { app, BrowserWindow, shell, ipcMain, globalShortcut } from 'electron';
 
 import { CreateTray } from './tray';
 import {
@@ -15,11 +7,9 @@ import {
   RENDERER_DIST,
   VITE_DEV_SERVER_URL,
   __dirname,
-  getAbsPackagedPath,
 } from './utils';
 import path from 'node:path';
 import os from 'node:os';
-import fs from 'node:fs';
 
 import { Setup as configSetup } from './components/configuration';
 import { Setup as socketSetup } from './components/socket';
@@ -30,15 +20,25 @@ import AppStorage from './components/storage';
 console.log("** c'est parti **");
 console.log('PID: %s', process.pid);
 
-/*evite l'erreur
-GTK 2/3 symbols detected. Using GTK 2/3 and GTK 4 in the same process is not supported
-*/
-app.commandLine.appendSwitch('gtk-version', '3');
+if (process.platform === 'linux') {
+  //console.log('Session Wayland :', process.env.XDG_SESSION_TYPE === 'wayland');
 
-// Enable usage of Portal's globalShortcuts. This is essential for cases when
-// the app runs in a Wayland session.
-app.commandLine.appendSwitch('enable-features', 'GlobalShortcutsPortal');
+  /*evite l'erreur
+  GTK 2/3 symbols detected. Using GTK 2/3 and GTK 4 in the same process is not supported
+  */
+  app.commandLine.appendSwitch('gtk-version', '3');
 
+  if (process.env.XDG_SESSION_TYPE === 'wayland') {
+    // Enable usage of Portal's globalShortcuts. This is essential for cases when
+    // the app runs in a Wayland session.
+    app.commandLine.appendSwitch('enable-features', 'GlobalShortcutsPortal');
+
+    //Wayland
+    app.commandLine.appendSwitch('enable-features', 'UseOzonePlatform');
+    app.commandLine.appendSwitch('enable-features', 'WaylandWindowDecorations');
+    app.commandLine.appendSwitch('enable-features', 'UseOzonePlatform');
+  }
+}
 // Disable GPU Acceleration for Windows 7
 if (os.release().startsWith('6.1')) app.disableHardwareAcceleration();
 
@@ -57,12 +57,11 @@ if (!app.requestSingleInstanceLock()) {
  * Main Window
  */
 let MainWindow: BrowserWindow | null = null;
+let MustClose = false;
 
 async function CreateMainWindow() {
   MainWindow = new BrowserWindow({
     title: 'POE2 Linux Companion - Loading',
-    //icon: path.join(process.env.VITE_PUBLIC, 'favicon.ico'),
-    //icon: AppIcon,
     icon: AppIconFile,
     webPreferences: {
       preload: PRELOAD,
@@ -73,54 +72,61 @@ async function CreateMainWindow() {
       // Read more on https://www.electronjs.org/docs/latest/tutorial/context-isolation
       // contextIsolation: false,
     },
-    transparent: false,
-    frame: true,
-    width: 400,
-    height: 400,
+    transparent: true,
+    frame: false,
+    width: 500,
+    height: 500,
     resizable: false,
     movable: false,
     center: true,
-    show: true,
     alwaysOnTop: true,
+    hasShadow: false,
+    fullscreenable: false,
+    skipTaskbar: true,
+    focusable: false,
+    show: false,
   });
 
   MainWindow.setMenu(null);
 
-  if (VITE_DEV_SERVER_URL) {
-    // #298
-    console.log(`===>> ${VITE_DEV_SERVER_URL}src/window-main/index.html`);
-
-    MainWindow.loadURL(`${VITE_DEV_SERVER_URL}src/window-main/index.html`);
-    //MainWindow.webContents.openDevTools()
-  } else {
-    MainWindow.loadFile(path.join(RENDERER_DIST, 'src/window-main/index.html'));
-    //    MainWindow.loadFile(path.join(__dirname, '../../dist/main/index.html'));
-    //console.log(path.join(__dirname, '../../dist/main/index.html'));
-  }
-
-  // Test actively push message to the Electron-Renderer
-  // MainWindow.webContents.on('did-finish-load', () => {
-  //   MainWindow?.webContents.send('main-process-message', new Date().toLocaleString())
-  // })
+  // MainWindow.setIgnoreMouseEvents(true, {
+  //   forward: true,
+  // });
 
   // Make all links open with the browser, not with the application
   MainWindow.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith('https:')) shell.openExternal(url);
     return { action: 'deny' };
   });
+
   // win.webContents.on('will-navigate', (event, url) => { }) #344
 
-  MainWindow.on('close', () => {
-    app.quit();
+  MainWindow.on('close', (e) => {
+    if (!MustClose) e.preventDefault();
+    MainWindow.hide();
   });
+
+  MainWindow.once('ready-to-show', () => {
+    MainWindow.show();
+    setTimeout(() => {
+      console.log('hide');
+      MainWindow.hide();
+    }, 3000);
+  });
+
+  app.on('before-quit', (e) => {
+    MustClose = true;
+  });
+
+  if (VITE_DEV_SERVER_URL) {
+    MainWindow.loadURL(`${VITE_DEV_SERVER_URL}src/window-main/index.html`);
+    MainWindow.webContents.openDevTools();
+  } else {
+    MainWindow.loadFile(path.join(RENDERER_DIST, 'src/window-main/index.html'));
+  }
 }
 
 app.whenReady().then(() => {
-  // if (fs.existsSync(AppIconFile)) console.log('icon existe');
-  // else {
-  //   console.log(`"icone n'existe pas : ${AppIconFile}"`);
-  //   lsRecursive(process.resourcesPath);
-  // }
   pricecheckSetup();
   configSetup();
   socketSetup();
@@ -133,28 +139,6 @@ app.whenReady().then(() => {
     appRegisterShorcuts();
   });
 });
-
-// function lsRecursive(dirPath) {
-//   // Lire le contenu du répertoire
-//   const files = fs.readdirSync(dirPath);
-
-//   // Parcourir chaque fichier/répertoire
-//   files.forEach((file) => {
-//     const fullPath = path.join(dirPath, file);
-
-//     // Obtenir les informations sur le fichier/répertoire
-//     const stats = fs.statSync(fullPath);
-
-//     if (stats.isDirectory()) {
-//       // Si c'est un répertoire, afficher son nom et explorer récursivement
-//       console.log(`Répertoire: ${fullPath}`);
-//       lsRecursive(fullPath);
-//     } else {
-//       // Si c'est un fichier, afficher son nom
-//       console.log(`Fichier: ${fullPath}`);
-//     }
-//   });
-// }
 
 app.on('will-quit', () => {
   globalShortcut.unregisterAll();
@@ -180,22 +164,18 @@ app.on('activate', () => {
   }
 });
 
-ipcMain.handle('show-openfile-dialog', OpenFileDialog);
+ipcMain.on('show-mainwindows', () => {
+  MainWindow.show();
+});
 
-async function OpenFileDialog(event, ...arg: string[]) {
-  const { canceled, filePaths } = await dialog.showOpenDialog({
-    title: 'Choisissez un fichier',
-    defaultPath: arg[0] ? arg[0] : '',
-    filters: [
-      { name: 'Poe2 Log file', extensions: ['txt'] },
-      { name: 'All Files', extensions: ['.*'] },
-    ],
-    properties: ['openFile'],
-  });
-  if (!canceled) {
-    return filePaths[0];
-  }
-}
+ipcMain.on('hide-mainwindow', () => {
+  MainWindow.hide();
+});
+
+/**
+ * Malheuresement ne fonctionne pas avec Wayland
+ * Utiliser plutot le serveur socket
+ */
 
 async function appRegisterShorcuts() {
   globalShortcut.unregisterAll();
@@ -206,9 +186,6 @@ async function appRegisterShorcuts() {
       console.log('pricecheck is pressed');
     })
   ) {
-    console.log(`enregistrement réussi`);
-  } else console.log('enregistrement échoué');
-
-  // Check si le raccourci est enregistré.
-  console.log(globalShortcut.isRegistered('CommandOrControl+X'));
+    console.log(`✓ Enregistrement des raccourcis globaux réussi.`);
+  } else console.log('⚠️ Enregistrement des raccourcis globaux échoué.');
 }

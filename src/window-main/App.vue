@@ -1,22 +1,34 @@
 <script setup lang="ts">
-function ShowWindow() {
-  window.ipcRenderer?.invoke('configuration-show-window');
-  //window.configuration.ShowWindow();
+async function Hide() {
+  window.ipcRenderer.send('hide-mainwindow');
 }
 </script>
 
 <template>
-  <img src="/logo.svg" alt="Logo" />
-  <button @click="ShowWindow">configuration</button>
+  <div class="overlay-container" @click="Hide">
+    <h1>Chargement ...</h1>
+  </div>
 </template>
 
-<style>
-body {
-  margin: 0;
-  padding: 0;
-  background-color: transparent;
+<style scoped>
+.overlay-container {
+  display: block;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 100%;
+  width: 100%;
+  /* background-color: transparent; */
+  background-image: url('/logo.png');
+  backdrop-filter: blur(6px);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.logo {
+  width: auto;
+  height: 100%;
+  margin-bottom: 20px;
 }
 </style>

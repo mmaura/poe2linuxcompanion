@@ -39,18 +39,22 @@ export async function Setup(
     // });
   });
 
-  server.listen(socketPath, () => {
-    console.log('***** Serveur en écoute sur le socket Unix:', socketPath);
-  });
+  if (server == undefined) {
+    console.log('⚠️ échec de creation : ', socketPath);
+  } else {
+    server.listen(socketPath, () => {
+      console.log('✓ Serveur en écoute sur : ', socketPath);
+    });
 
-  // Server.on('connection', function(socket){
-  //     console.log('*****Client connected.');
-  //     console.log('*****Sending boop.');
-  //     socket.write('__boop');
-  // })
+    // Server.on('connection', function(socket){
+    //     console.log('*****Client connected.');
+    //     console.log('*****Sending boop.');
+    //     socket.write('__boop');
+    // })
 
-  //clean on exit
-  app.on('will-quit', () => {
-    server.close();
-  });
+    //clean on exit
+    app.on('will-quit', () => {
+      server.close();
+    });
+  }
 }

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
 import path from 'node:path';
 import { PRELOAD, __dirname } from '../utils.js';
 
@@ -35,6 +35,12 @@ export async function Setup() {
       Window.webContents.on('did-finish-load', () => {
         console.log('finished');
         Window.webContents.send('removeLoading');
+      });
+
+      // Make all links open with the browser, not with the application
+      Window.webContents.setWindowOpenHandler(({ url }) => {
+        if (url.startsWith('https:')) shell.openExternal(url);
+        return { action: 'deny' };
       });
     }
     const url = itemLines.slice(0).join('\n');

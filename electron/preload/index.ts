@@ -1,4 +1,5 @@
 import { ipcRenderer, contextBridge } from 'electron';
+import { BUYER } from '../../shared/types';
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('ipcRenderer', {
@@ -167,7 +168,7 @@ contextBridge.exposeInMainWorld('configuration', {
  * clientlog
  */
 contextBridge.exposeInMainWorld('clientlog', {
-  onNewLine: (callback: (line: string) => void) => {
+  onNewBuyer: (callback: (buyer: BUYER) => void) => {
     ipcRenderer.on('log-line', (_, line) => callback(line));
   },
 });

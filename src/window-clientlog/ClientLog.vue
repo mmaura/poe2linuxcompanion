@@ -1,32 +1,21 @@
 <template>
-  <h1>Client Log</h1>
   <div class="p-4 overflow-y-auto h-full">
-    <ClientLogLine
-      v-for="(line, index) in logLines"
-      :key="index"
-      :date="line.date"
-      :message="line.message"
-    />
+    <Buyer v-for="(buyer, index) in buyers" :key="index" :buyer="buyer" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import ClientLogLine from './ClientLogLine.vue';
+import { BUYER } from '../../shared/types';
+import Buyer from './Buyer.vue';
 
-type LogLine = {
-  date: string;
-  message: string;
-};
-
-const logLines = ref<LogLine[]>([]);
+const buyers = ref<BUYER[]>([]);
 
 onMounted(() => {
   // Abonnement au flux IPC pour chaque nouvelle ligne
-  window.clientlog?.onNewLine?.((logLine: string) => {
-    const [date, ...rest] = logLine.split(' ');
-    const message = rest.join(' ');
-    logLines.value.push({ date, message });
+  window.clientlog.onNewBuyer((buyer: BUYER) => {
+    console.log(buyer);
+    buyers.value.push(buyer);
   });
 });
 </script>

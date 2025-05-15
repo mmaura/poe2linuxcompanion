@@ -8,5 +8,5 @@
     //"module": "node16",
     //"moduleResolution": "node16"
   },
-  "include": ["vite.config.ts", "package.json", "electron"]
+  "include": ["vite.config.ts", "package.json", "electron", "shared"]
 }

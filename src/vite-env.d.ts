@@ -10,6 +10,10 @@ interface Window {
   // expose in the `electron/preload/index.ts`
   ipcRenderer: import('electron').IpcRenderer;
 
+  app: {
+    GetLocale: () => string;
+  };
+
   configuration: {
     ShowPoe2logFileDialog: (path: string) => Promise<string>;
     ShowWindow: () => void;
@@ -26,6 +30,6 @@ interface Window {
   };
 
   clientlog: {
-    onNewLine: (callback: (line: string) => void) => void;
+    onNewBuyer: (callback: (buyer: BUYER) => void) => void;
   };
 }
