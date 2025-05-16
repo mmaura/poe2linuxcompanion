@@ -167,8 +167,15 @@ contextBridge.exposeInMainWorld('configuration', {
 /**
  * clientlog
  */
-contextBridge.exposeInMainWorld('clientlog', {
+contextBridge.exposeInMainWorld('commerce', {
   onNewBuyer: (callback: (buyer: BUYER) => void) => {
-    ipcRenderer.on('log-line', (_, line) => callback(line));
+    ipcRenderer.on('commerce-newbuyer', (_, buyer) => callback(buyer));
+  },
+  onUpdateBuyer: (
+    callback: (playername: string, updates: Partial<BUYER>) => void
+  ) => {
+    ipcRenderer.on('commerce-updatebuyer', (_, playername, update) =>
+      callback(playername, update)
+    );
   },
 });

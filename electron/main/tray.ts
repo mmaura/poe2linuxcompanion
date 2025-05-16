@@ -19,6 +19,18 @@ export async function CreateTray() {
       },
     },
     {
+      label: 'Tests', // <- ici c'est "label", pas "sublabel"
+      submenu: [
+        {
+          label: 'Test 1',
+          click: async () => {
+            ipcMain.emit('clientlog-test1');
+          },
+        },
+      ],
+    },
+
+    {
       label: 'quitter',
       click: async () => {
         app.quit();

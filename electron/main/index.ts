@@ -14,6 +14,7 @@ import os from 'node:os';
 import { Setup as configSetup } from './components/configuration';
 import { Setup as socketSetup } from './components/socket';
 import { Setup as clientlogSetup } from './components/clientlog';
+import { Setup as commerceSetup } from './components/commerce';
 import { Setup as pricecheckSetup } from './components/pricecheck';
 import AppStorage from './components/storage';
 
@@ -109,7 +110,6 @@ async function CreateMainWindow() {
   MainWindow.once('ready-to-show', () => {
     MainWindow.show();
     setTimeout(() => {
-      console.log('hide');
       MainWindow.hide();
     }, 3000);
   });
@@ -120,7 +120,7 @@ async function CreateMainWindow() {
 
   if (VITE_DEV_SERVER_URL) {
     MainWindow.loadURL(`${VITE_DEV_SERVER_URL}src/window-main/index.html`);
-    MainWindow.webContents.openDevTools();
+    //MainWindow.webContents.openDevTools();
   } else {
     MainWindow.loadFile(path.join(RENDERER_DIST, 'src/window-main/index.html'));
   }
@@ -129,6 +129,7 @@ async function CreateMainWindow() {
 app.whenReady().then(() => {
   pricecheckSetup();
   configSetup();
+  commerceSetup();
   socketSetup();
   clientlogSetup();
   CreateTray();

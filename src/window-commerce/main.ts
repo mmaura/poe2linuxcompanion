@@ -1,8 +1,8 @@
 import { createApp } from 'vue';
-import ClientLog from './ClientLog.vue';
+import Commerce from './Commerce.vue';
 
-createApp(ClientLog)
-  .mount('#clientlog')
+createApp(Commerce)
+  .mount('#Commerce')
   .$nextTick(() => {
     postMessage({ payload: 'removeLoading' }, '*');
   });

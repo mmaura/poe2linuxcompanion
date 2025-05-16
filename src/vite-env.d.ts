@@ -29,7 +29,11 @@ interface Window {
     getPricecheckShortcut: () => string;
   };
 
-  clientlog: {
+  commerce: {
     onNewBuyer: (callback: (buyer: BUYER) => void) => void;
+
+    onUpdateBuyer: (
+      callback: (playername: string, updates: Partial<BUYER>) => void
+    ) => void;
   };
 }
