@@ -6,105 +6,123 @@
       playerIsNotHere: !buyer.playerIsHere,
     }"
   >
-    <div class="flex-row">
-      <div
-        class="message-container interactive"
-        @mouseenter="markMessagesAsRead"
-      >
-        <li
-          class="fa-regular fa-message message-icon"
-          :class="{
-            newmsg: buyer.messages.findIndex((m) => m.unread === true) != -1,
-          }"
-        ></li>
-        <div class="message-popup">
-          <p v-if="buyer.messages.length === 0">Aucun message</p>
-          <ul v-else>
-            <li v-for="(msg, index) in buyer.messages" :key="index">
-              <strong>[{{ formatTime(msg.date) }}]</strong>
-              <em>({{ msg.direction }})</em> : {{ msg.message }}<br />
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="username">
-        {{ buyer.playername }}
-      </div>
-      <div class="time">{{ tempsEcoule }}</div>
+    <div class="number">
+      <p>{{ buyer.customIndex }}</p>
     </div>
-    <div class="flex-row secondline">
-      <div>
+    <div>
+      <audio id="notificationSound" :src="notifSoundFile"></audio>
+      <div class="flex-row">
+        <div
+          class="message-container interactive"
+          @mouseenter="markMessagesAsRead"
+        >
+          <li
+            class="fa-regular fa-message message-icon"
+            :class="{
+            newmsg: buyer.messages.findIndex((m:any) => m.unread === true) != -1,
+          }"
+          ></li>
+          <div class="message-popup">
+            <p v-if="buyer.messages.length === 0">Aucun message</p>
+            <ul v-else>
+              <li v-for="(msg, index) in buyer.messages" :key="index">
+                <strong>[{{ formatTime(msg.date) }}]</strong>
+                <em>({{ msg.direction }})</em> : {{ msg.message }}<br />
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="username">
+          {{ buyer.playername }}
+        </div>
+        <div class="time">{{ tempsEcoule }}</div>
+      </div>
+      <div class="flex-row secondline">
+        <div>
+          <button
+            class="fas fa-clipboard interactive"
+            @click="copyObjectToClipboard"
+            title="Copier le nom de l'objet"
+          ></button>
+        </div>
+        <div class="objet">
+          {{ buyer.objet }}
+        </div>
+        <div class="quantity">{{ buyer.price.quantity }}</div>
+        <div class="currency"><img :src="img" /></div>
+      </div>
+      <div class="flex-row-reverse">
+        {{ buyer.league }} (Tab: {{ buyer.tab }} / Pos: {{ buyer.xpos }};{{
+          buyer.ypos
+        }})
+      </div>
+      <div class="flex-row commands">
         <button
-          class="fas fa-clipboard interactive"
-          @click="copyObjectToClipboard"
-          title="Copier le nom de l'objet"
+          title="Demander d'attendre"
+          class="fa-regular fa-hourglass-half"
+          @click="SayWait()"
+        ></button>
+        <div class="separator"></div>
+        <button
+          :class="{ currentAction: buyer.currentAction == 'invite' }"
+          :disabled="buyer.direction == 'buy'"
+          title="invite"
+          class="fa-solid fa-people-line"
+          @click="Invite()"
+        ></button>
+        <button
+          :class="{
+            currentAction:
+              buyer.currentAction == 'hideout' && buyer.direction == 'buy',
+          }"
+          :disabled="buyer.direction == 'buy'"
+          title="Rentrer au hideout."
+          class="fa-solid fa-house"
+          @click="ReturnHideout()"
+        ></button>
+        <button
+          :class="{
+            currentAction:
+              buyer.currentAction == 'hideout' && buyer.direction == 'sell',
+          }"
+          :disabled="buyer.direction == 'sell'"
+          title="Se rendre au hideout du joueur."
+          class="fa-solid fa-house-flag"
+          @click="ToPlayerHideout()"
+        ></button>
+        <div class="separator"></div>
+        <div class="separator"></div>
+        <button
+          :class="{ currentAction: buyer.currentAction == 'trade' }"
+          title="Echanger"
+          class="fa-solid fa-right-left"
+          @click="Exchange()"
+        ></button>
+        <button
+          :class="{ currentAction: buyer.currentAction == 'thx' }"
+          title="Dire merci"
+          class="fa-regular fa-face-smile-beam"
+          @click="SayThx()"
+        ></button>
+        <button
+          :class="{ currentAction: buyer.currentAction == 'kick' }"
+          title="Renvoyer le joueur et finir la transaction"
+          class="fa-solid fa-person-walking-arrow-right"
+          @click="Ungroup()"
+        ></button>
+        <div class="separator"></div>
+        <div class="separator"></div>
+        <div class="separator"></div>
+        <div class="separator"></div>
+        <div class="separator"></div>
+        <div class="separator"></div>
+        <button
+          title="Fermer"
+          class="fa-solid fa-xmark"
+          @click="destroySelf()"
         ></button>
       </div>
-      <div class="objet">
-        {{ buyer.objet }}
-      </div>
-      <div class="quantity">{{ buyer.price.quantity }}</div>
-      <div class="currency"><img :src="img" /></div>
-    </div>
-    <div class="flex-row-reverse">
-      {{ buyer.league }} (Tab: {{ buyer.tab }} / Pos: {{ buyer.xpos }};{{
-        buyer.ypos
-      }})
-    </div>
-    <div class="flex-row commands">
-      <button
-        title="Demander d'attendre"
-        class="fa-regular fa-hourglass-half"
-        @click="SayWait()"
-      ></button>
-      <div class="separator"></div>
-      <button
-        :disabled="buyer.direction == 'buy'"
-        title="invite"
-        class="fa-solid fa-people-line"
-        @click="Invite()"
-      ></button>
-      <button
-        :disabled="buyer.direction == 'buy'"
-        title="Rentrer au hideout."
-        class="fa-solid fa-house"
-        @click="ReturnHideout()"
-      ></button>
-      <button
-        :disabled="buyer.direction == 'sell'"
-        title="Se rendre au hideout du joueur."
-        class="fa-solid fa-house-flag"
-        @click="ToPlayerHideout()"
-      ></button>
-      <div class="separator"></div>
-      <div class="separator"></div>
-      <button
-        title="Echanger"
-        class="fa-solid fa-right-left"
-        @click="Exchange()"
-      ></button>
-      <button
-        title="Dire merci"
-        class="fa-regular fa-face-smile-beam"
-        @click="SayThx()"
-      ></button>
-      <button
-        title="Renvoyer le joueur et finir la transaction"
-        class="fa-solid fa-person-walking-arrow-right"
-        @click="Ungroup()"
-      ></button>
-      <div class="separator"></div>
-      <div class="separator"></div>
-      <div class="separator"></div>
-      <div class="separator"></div>
-      <div class="separator"></div>
-      <div class="separator"></div>
-      <button
-        title="Fermer"
-        class="fa-solid fa-xmark"
-        @click="destroySelf()"
-      ></button>
     </div>
   </div>
 </template>
@@ -114,11 +132,13 @@ import { onMounted, onUnmounted, ref } from 'vue';
 import { BUYER } from '../../shared/types';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import alchIcon from '@/assets/currency/39px-Orb_of_Alchemy_inventory_icon.png';
+import regalIcon from '@/assets/currency/39px-Orb_of_Alchemy_inventory_icon.png';
+import defaultNofifSound from '@/assets/sound/notification.mp3';
 
 const img = ref('');
 const tempsEcoule = ref('');
-const unreadMsg = ref(false);
-
+//const unreadMsg = ref(false);
+const notifSoundFile = ref(defaultNofifSound);
 const props = defineProps<{
   buyer: BUYER;
 }>();
@@ -126,6 +146,9 @@ const props = defineProps<{
 switch (props.buyer.price.currency) {
   case 'alch':
     img.value = alchIcon;
+    break;
+  case 'regal':
+    img.value = regalIcon;
     break;
 }
 
@@ -139,6 +162,9 @@ function Exchange() {
 
 function SayThx() {
   window.ipcRenderer.send('saythx-player', props.buyer.playername);
+  const destroySelf = () => {
+    emit('destroy', props.buyer.id); // Émet un événement avec l'ID de l'acheteur
+  };
 }
 
 function Ungroup() {
@@ -177,7 +203,7 @@ function formatTime(date: Date | string): string {
 function copyObjectToClipboard() {
   if (props.buyer.objet) {
     navigator.clipboard
-      .writeText(props.buyer.objet)
+      .writeText(props.buyer.objet.trim().replaceAll(',', ''))
       .then(() => {
         console.log('Texte copié :', props.buyer.objet);
       })
@@ -204,7 +230,17 @@ function formatElapsed(ms: number): string {
 
 let intervalId: number;
 
+function playNotificationSound() {
+  let audio: HTMLAudioElement = document.getElementById(
+    'notificationSound'
+  ) as HTMLAudioElement;
+  audio
+    ?.play()
+    ?.catch((e) => console.error('Erreur lors de la lecture du son:', e));
+}
+
 onMounted(() => {
+  playNotificationSound();
   intervalId = window.setInterval(() => {
     const now = new Date();
     const diff = now.getTime() - new Date(props.buyer.date).getTime();
@@ -220,25 +256,41 @@ onUnmounted(() => {
 <style>
 .incoming {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   color: gold;
   background-color: black;
-  pointer-events: auto; /* ✅ Ajouté */
 }
 
+.number {
+  color: gold;
+  font-size: 30px;
+  width: 30px;
+  vertical-align: middle;
+  padding-left: 2px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Ombre portée */
+}
 .playerIsHere {
   border: 1px greenyellow solid;
-  border-left: 10px greenyellow solid;
-}
-
-.playerIsHere > * button {
-  border: 1px greenyellow solid;
-  color: greenyellow;
+  animation: bgHere 1.2s infinite alternate;
+  background: linear-gradient(
+    to right,
+    greenyellow 2%,
+    black 20%,
+    black 90%,
+    transparent 100%
+  );
+  background-size: 100% 100%;
 }
 
 .playerIsNotHere {
   border: 1px green solid;
-  border-left: 10px green solid;
+  background: linear-gradient(
+    to right,
+    green 2%,
+    black 20%,
+    black 90%,
+    transparent 100%
+  );
 }
 
 .username {
@@ -266,6 +318,12 @@ button {
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+button.currentAction {
+  border: 1px greenyellow solid;
+  color: greenyellow;
+  transform: scale(1.2);
 }
 
 button:hover {
@@ -321,6 +379,14 @@ button:disabled {
 .flex-row {
   display: flex;
   flex-direction: row;
+  /* justify-content: space-between; */
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
   /* justify-content: space-between; */
   padding-left: 2px;
   padding-right: 2px;
@@ -387,6 +453,29 @@ button:disabled {
   100% {
     color: red;
     transform: scale(1.2);
+  }
+}
+
+@keyframes bgHere {
+  from {
+    background: linear-gradient(
+      to right,
+      greenyellow 2%,
+      black 20%,
+      black 90%,
+      transparent 100%
+    );
+    background-size: 100% 100%;
+  }
+  to {
+    background: linear-gradient(
+      to right,
+      green 2%,
+      black 20%,
+      black 90%,
+      transparent 100%
+    );
+    background-size: 100% 100%;
   }
 }
 </style>

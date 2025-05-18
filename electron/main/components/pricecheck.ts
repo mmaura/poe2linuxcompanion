@@ -4,11 +4,12 @@ import { PRELOAD, __dirname } from '../utils.js';
 
 import AppStorage from './storage';
 
-let Window: BrowserWindow = null;
+let Window: BrowserWindow | null = null;
 
 export async function Setup() {
   ipcMain.on('pricecheck-checkitem', (_, ...itemLines: string[]) => {
-    console.log('priocecheck');
+    console.log('pricecheck');
+    console.log(itemLines);
 
     if (!Window) {
       Window = new BrowserWindow({
@@ -34,7 +35,7 @@ export async function Setup() {
 
       Window.webContents.on('did-finish-load', () => {
         console.log('finished');
-        Window.webContents.send('removeLoading');
+        Window?.webContents.send('removeLoading');
       });
 
       // Make all links open with the browser, not with the application
@@ -43,6 +44,7 @@ export async function Setup() {
         return { action: 'deny' };
       });
     }
+
     const url = itemLines.slice(0).join('\n');
     const url64: string = Buffer.from(url).toString('base64');
 
@@ -52,5 +54,5 @@ export async function Setup() {
 }
 
 app.on('will-quit', () => {
-  Window = null;
+  //Window = null;
 });

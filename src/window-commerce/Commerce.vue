@@ -1,18 +1,7 @@
 <template>
   <div ref="content" class="p-4 overflow-y-auto h-full buyer-container">
     <template v-for="(buyer, index) in buyers" :key="buyer.id">
-      <Buy
-        class="fadein"
-        v-if="buyer.direction === 'buy'"
-        :buyer="buyer"
-        @destroy="removeBuyer(buyer.id)"
-      />
-      <Sell
-        class="fadein"
-        v-else-if="buyer.direction === 'sell'"
-        :buyer="buyer"
-        @destroy="removeBuyer(buyer.id)"
-      />
+      <Sell class="fadein" :buyer="buyer" @destroy="removeBuyer(buyer.id)" />
     </template>
   </div>
 </template>
@@ -20,7 +9,6 @@
 <script setup lang="ts">
 import { reactive, ref, onMounted, nextTick } from 'vue';
 import { BUYER, Message } from '../../shared/types'; // Importez les deux types
-import Buy from './Buy.vue';
 import Sell from './Sell.vue';
 
 const buyers = reactive<BUYER[]>([]);
@@ -50,10 +38,30 @@ onMounted(() => {
       });
     }
   );
+
+  window.commerce.onUpdateBuyerId((id: string, updates: Partial<BUYER>) => {
+    console.log(`update: ${id}`, updates);
+    updateBuyerId(id, updates);
+    nextTick(() => {
+      adjustWindowHeight();
+    });
+  });
 });
 
 function updateBuyer(playername: string, updates: Partial<BUYER>) {
   const buyerIndex = buyers.findIndex((b) => b.playername === playername);
+  if (buyerIndex !== -1) {
+    Object.assign(buyers[buyerIndex], updates);
+    if (updates.messages) {
+      addMessagesToBuyer(buyers[buyerIndex], updates.messages);
+    }
+  } else {
+    console.log('buyer inexistant.');
+  }
+}
+
+function updateBuyerId(id: string, updates: Partial<BUYER>) {
+  const buyerIndex = buyers.findIndex((b) => b.id === id);
   if (buyerIndex !== -1) {
     Object.assign(buyers[buyerIndex], updates);
     if (updates.messages) {
@@ -71,6 +79,9 @@ function addMessagesToBuyer(buyer: BUYER, newMessages: Message[]) {
 
 function removeBuyer(id: string) {
   const index = buyers.findIndex((buyer) => buyer.id === id);
+
+  window.ipcRenderer.send('commerce-remove-buyer', buyers[index].id);
+
   if (index !== -1) {
     buyers.splice(index, 1); // Supprime l'acheteur de la liste
     nextTick(() => {

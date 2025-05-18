@@ -48,6 +48,7 @@ export const createLogProcessors = (lang: string) => {
 
   return [
     {
+      //demande d'achat
       regex: buyerRegExp,
       process: (line: string) => {
         console.log('buyer');
@@ -70,6 +71,7 @@ export const createLogProcessors = (lang: string) => {
 
           const buyer: BUYER = {
             id: `${playername}-${objet}`,
+            currentAction: 'invite',
             date: new Date(date),
             direction: 'sell',
             playername: playername,
@@ -90,6 +92,7 @@ export const createLogProcessors = (lang: string) => {
       },
     },
     {
+      //Player Arrive
       regex: playerArrivalRegExp,
       process: (line: string) => {
         const arrivalResult = playerArrivalRegExp.exec(line);
@@ -98,11 +101,13 @@ export const createLogProcessors = (lang: string) => {
           const [, date, playername] = arrivalResult;
           ipcMain.emit('clientlog-updatebuyer', {}, playername, {
             playerIsHere: true,
+            currentAction: 'trade',
           }); // ipcMain.emit('channel', event, ...args)
         }
       },
     },
     {
+      //Player repart
       regex: playerDepartureRegExp,
       process: (line: string) => {
         const departureResult = playerDepartureRegExp.exec(line);
@@ -111,6 +116,7 @@ export const createLogProcessors = (lang: string) => {
           const [, date, playername] = departureResult;
           ipcMain.emit('clientlog-updatebuyer', {}, playername, {
             playerIsHere: false,
+            currentAction: 'kick',
           });
         }
       },

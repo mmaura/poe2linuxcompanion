@@ -32,3 +32,17 @@ export function getRessourcesPath(...arg): string {
     ? path.resolve(path.join(app.getAppPath(), 'dist', ...arg))
     : path.resolve(path.join(app.getAppPath(), 'public', ...arg));
 }
+
+export function detectDesktopEnvironment(): string | null {
+  if (process.env.XDG_CURRENT_DESKTOP) {
+    const desktopEnv = process.env.XDG_CURRENT_DESKTOP.toLowerCase();
+    if (desktopEnv.includes('kde')) {
+      return 'KDE';
+    } else if (desktopEnv.includes('gnome')) {
+      return 'Gnome';
+    } else if (desktopEnv.includes('xfce')) {
+      return 'XFCE';
+    }
+  }
+  return null;
+}

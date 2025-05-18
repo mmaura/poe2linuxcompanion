@@ -1,6 +1,6 @@
 import { app, ipcMain, Menu, Tray } from 'electron';
 import { AppIconFile } from './utils';
-let AppTray = null;
+let AppTray; //= null;
 
 export async function CreateTray() {
   AppTray = new Tray(AppIconFile);
@@ -16,6 +16,12 @@ export async function CreateTray() {
       label: 'ClientLog',
       click: async () => {
         ipcMain.emit('clientlog-show-window');
+      },
+    },
+    {
+      label: 'Sidekick',
+      click: async () => {
+        ipcMain.emit('sidekick-show-window');
       },
     },
     {

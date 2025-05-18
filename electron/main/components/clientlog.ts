@@ -10,7 +10,7 @@ export async function Setup() {
   const lang = app.getLocale().toLowerCase();
   console.log('Langue détectée:', lang);
 
-  let lastSize = 0;
+  let initialScanComplete: boolean = false;
 
   const logProcessors = createLogProcessors(lang);
 
@@ -20,7 +20,60 @@ export async function Setup() {
     return;
   }
 
+  const stats: fs.Stats = fs.statSync(logFilePath);
+
+  //let lastSize = 0;
+  let lastSize: number = stats.size;
+
   chokidar
+    .watch(logFilePath, {
+      persistent: true,
+      awaitWriteFinish: true,
+      ignoreInitial: true,
+    })
+    .on('add', () => {
+      // Do nothing on initial add
+    })
+    .on('change', () => {
+      try {
+        const stats: fs.Stats = fs.statSync(logFilePath);
+
+        if (stats.size < lastSize) {
+          // Log file rotated
+          lastSize = 0;
+        }
+
+        if (stats.size > lastSize && initialScanComplete) {
+          const stream: fs.ReadStream = fs.createReadStream(logFilePath, {
+            start: lastSize,
+            end: stats.size,
+            encoding: 'utf-8',
+          });
+
+          const rl: readline.Interface = readline.createInterface({
+            input: stream,
+          });
+
+          rl.on('line', (line: string) => {
+            ipcMain.emit('log-line', {}, line);
+          });
+
+          rl.on('close', () => {
+            lastSize = stats.size;
+          });
+        } else {
+          lastSize = stats.size; // Update lastSize even if no new lines are processed
+        }
+      } catch (error: any) {
+        console.error('Error processing log file:', error);
+      }
+    })
+    .on('ready', () => {
+      initialScanComplete = true;
+      console.log('Initial scan complete. Ready for changes.');
+    });
+
+  /*        chokidar
     .watch(logFilePath, { persistent: true, awaitWriteFinish: true })
     .on('change', () => {
       const stats = fs.statSync(logFilePath);
@@ -45,7 +98,7 @@ export async function Setup() {
         lastSize = stats.size;
       });
     });
-
+*/
   console.log(`🕵️ Surveillance de ${logFilePath} démarrée.`);
 
   ipcMain.on('log-line', async (_, line: string) => {

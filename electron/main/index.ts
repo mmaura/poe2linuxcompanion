@@ -7,6 +7,7 @@ import {
   RENDERER_DIST,
   VITE_DEV_SERVER_URL,
   __dirname,
+  detectDesktopEnvironment,
 } from './utils';
 import path from 'node:path';
 import os from 'node:os';
@@ -16,6 +17,8 @@ import { Setup as socketSetup } from './components/socket';
 import { Setup as clientlogSetup } from './components/clientlog';
 import { Setup as commerceSetup } from './components/commerce';
 import { Setup as pricecheckSetup } from './components/pricecheck';
+import { Setup as gamecommandSetup } from './components/gamecommand';
+
 import AppStorage from './components/storage';
 
 console.log("** c'est parti **");
@@ -104,13 +107,13 @@ async function CreateMainWindow() {
 
   MainWindow.on('close', (e) => {
     if (!MustClose) e.preventDefault();
-    MainWindow.hide();
+    MainWindow?.hide();
   });
 
   MainWindow.once('ready-to-show', () => {
-    MainWindow.show();
+    MainWindow?.show();
     setTimeout(() => {
-      MainWindow.hide();
+      MainWindow?.hide();
     }, 3000);
   });
 
@@ -127,6 +130,12 @@ async function CreateMainWindow() {
 }
 
 app.whenReady().then(() => {
+  const desktopEnvironment = detectDesktopEnvironment();
+  if (desktopEnvironment) {
+    console.log(`Environnement de bureau détecté : ${desktopEnvironment}`);
+  } else {
+    console.log('Environnement de bureau non détecté.');
+  }
   pricecheckSetup();
   configSetup();
   commerceSetup();
@@ -134,7 +143,8 @@ app.whenReady().then(() => {
   clientlogSetup();
   CreateTray();
   CreateMainWindow();
-  appRegisterShorcuts();
+  //appRegisterShorcuts();
+  gamecommandSetup();
 
   AppStorage.onDidChange('hotkeys', () => {
     appRegisterShorcuts();
@@ -166,11 +176,11 @@ app.on('activate', () => {
 });
 
 ipcMain.on('show-mainwindows', () => {
-  MainWindow.show();
+  MainWindow?.show();
 });
 
 ipcMain.on('hide-mainwindow', () => {
-  MainWindow.hide();
+  MainWindow?.hide();
 });
 
 /**

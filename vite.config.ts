@@ -91,7 +91,7 @@ export default defineConfig(({ command }) => {
         input: {
           main: resolve(__dirname, 'src/window-main/index.html'),
           config: resolve(__dirname, 'src/window-config/index.html'),
-          clientlog: resolve(__dirname, 'src/window-clientlog/index.html'),
+          commerce: resolve(__dirname, 'src/window-commerce/index.html'),
         },
         output: {
           // Cela crée des sous-dossiers selon les clés (main, config)

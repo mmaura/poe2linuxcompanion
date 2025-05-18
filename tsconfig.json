@@ -1,23 +1,22 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "useDefineForClassFields": true,
     "module": "ESNext",
+    "useDefineForClassFields": true,
     "moduleResolution": "Node",
     "strict": true,
-    "jsx": "preserve",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowJs": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "esModuleInterop": true,
-    "lib": ["ESNext", "DOM"],
-    "skipLibCheck": true,
-    "noEmit": true
+    "jsx": "preserve",
+    // Ne PAS générer les .d.ts car vue-tsc s’en charge
+    "declaration": false,
+    "noEmit": true, // tsc ne doit rien émettre ici
+    "types": []
   },
-  "include": [
-    "src",
-    "src/window-main/App.vue",
-    "src/window-config/Config.vue",
-    "packasrc/window-main/main.ts"
-  ],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src", "shared"], // ✅ tu peux inclure shared ici
+  "exclude": ["dist", "dist-electron", "node_modules"]
 }

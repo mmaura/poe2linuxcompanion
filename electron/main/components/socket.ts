@@ -11,7 +11,7 @@ export async function Setup(
     'poe2linuxcompanion.socket'
   )
 ) {
-  let server: net.Server = null;
+  let server: net.Server;
 
   //remove socket if exist
   if (fs.existsSync(socketPath)) fs.unlinkSync(socketPath);
@@ -23,11 +23,37 @@ export async function Setup(
 
       switch (command[0]) {
         case 'show-config':
-          ipcMain.emit('configuration-show-window');
+          ipcMain.emit('configuration-show-window', {}); // channel, event
           break;
+        //check price
         case 'pricecheck':
           console.log('pricecheck');
           ipcMain.emit('pricecheck-checkitem', ...command);
+          break;
+        //do the next action for buyer 1 (invite => /hideout => trade => kick)
+        case 'buyer1':
+          console.log('buyer1');
+          ipcMain.emit('commerce-buyer', '1');
+          break;
+        //do the next action for buyer 1 (invite => /hideout => trade => kick)
+        case 'buyer2':
+          console.log('buyer2');
+          ipcMain.emit('commerce-buyer', '2');
+          break;
+        //do the next action for buyer 1 (invite => /hideout => trade => kick)
+        case 'buyer1':
+          console.log('buyer3');
+          ipcMain.emit('commerce-buyer', '3');
+          break;
+        //do the next action for buyer 1 (invite => /hideout => trade => kick)
+        case 'buyer1':
+          console.log('buyer4');
+          ipcMain.emit('commerce-buyer', '4');
+          break;
+        //say wait to the last buyer
+        case 'buyer-wait':
+          console.log('buyer-wait');
+          ipcMain.emit('commerce-buyer-wait', {});
           break;
         default:
           console.log('commande inconnue');
@@ -43,7 +69,7 @@ export async function Setup(
     console.log('⚠️ échec de creation : ', socketPath);
   } else {
     server.listen(socketPath, () => {
-      console.log('✓ Serveur en écoute sur : ', socketPath);
+      console.log('✅ Serveur en écoute sur : ', socketPath);
     });
 
     // Server.on('connection', function(socket){

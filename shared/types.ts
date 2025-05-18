@@ -4,8 +4,11 @@ export interface Message {
   direction: 'from' | 'to';
   unread: boolean;
 }
+
 export interface BUYER {
   id: string;
+  customIndex?: Number;
+  currentAction: 'invite' | 'hideout' | 'trade' | 'thx' | 'kick';
   date: Date;
   direction: 'buy' | 'sell';
   playername: string;

@@ -132,7 +132,7 @@ setTimeout(removeLoading, 4999);
  * configuration
  */
 contextBridge.exposeInMainWorld('configuration', {
-  ShowPoe2logFileDialog: (path: string = null) =>
+  ShowPoe2logFileDialog: (path: string | null = null) =>
     ipcRenderer.invoke('configuration-show-poe2logfiledialog', path),
 
   ShowWindow: () => ipcRenderer.invoke('configuration-show-window'),
@@ -176,6 +176,13 @@ contextBridge.exposeInMainWorld('commerce', {
   ) => {
     ipcRenderer.on('commerce-updatebuyer', (_, playername, update) =>
       callback(playername, update)
+    );
+  },
+  onUpdateBuyerId: (
+    callback: (id: string, updates: Partial<BUYER>) => void
+  ) => {
+    ipcRenderer.on('commerce-updatebuyer-id', (_, id, update) =>
+      callback(id, update)
     );
   },
 });
