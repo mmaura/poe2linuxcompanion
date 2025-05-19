@@ -1,5 +1,6 @@
 import { app, ipcMain, Menu, Tray } from 'electron';
 import { AppIconFile } from './utils';
+import { LogProcessor } from '../../shared/ipc-events';
 let AppTray; //= null;
 
 export async function CreateTray() {
@@ -10,12 +11,6 @@ export async function CreateTray() {
       label: 'Configuration',
       click: async () => {
         ipcMain.emit('configuration-show-window');
-      },
-    },
-    {
-      label: 'ClientLog',
-      click: async () => {
-        ipcMain.emit('clientlog-show-window');
       },
     },
     {
@@ -30,7 +25,7 @@ export async function CreateTray() {
         {
           label: 'Test 1',
           click: async () => {
-            ipcMain.emit('clientlog-test1');
+            ipcMain.emit(LogProcessor.RUN_TEST1);
           },
         },
       ],

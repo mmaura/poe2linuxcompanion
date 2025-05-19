@@ -3,7 +3,12 @@ import { PRELOAD, RENDERER_DIST, VITE_DEV_SERVER_URL } from '../utils';
 import path from 'node:path';
 
 import windowStateKeeper from 'electron-window-state';
-import { BUYER } from '../../../shared/types';
+import { Buyer } from '../../../shared/types';
+import {
+  LogProcessor,
+  Commerce,
+  GameCommands,
+} from '../../../shared/ipc-events';
 
 const WINDOW_WIDTH = 400;
 
@@ -13,9 +18,8 @@ export async function Setup() {
   });
 
   let lastBuyerName = '';
-  //let curentBuyerIndex = 0;
 
-  let Buyers: BUYER[] = [];
+  let Buyers: Buyer[] = [];
 
   let window: BrowserWindow | null = null;
   window = new BrowserWindow({
@@ -58,58 +62,60 @@ export async function Setup() {
     window.loadFile(path.join(RENDERER_DIST, 'src/window-commerce/index.html'));
     window.webContents.openDevTools();
   }
-  ipcMain.on('set-window-height', (_, height) => {
-    console.log('ajustement');
+
+  /**
+   * Register Events
+   *
+   * */
+  ipcMain.on(Commerce.SET_WINDOW_HEIGHT, (_, height) => {
     window?.setResizable(true);
     window?.setSize(WINDOW_WIDTH, height);
     window?.setResizable(false);
   });
 
-  //nouveau buyer détecté dans le log
-  ipcMain.on('clientlog-newbuyer', (_, buyer: BUYER) => {
-    console.log('clientlog-newbuyer');
-    const index = Buyers.push(buyer);
-    buyer.customIndex = index;
-    Buyers[index - 1].customIndex = index;
-    //console.log(buyer);
+  ipcMain.on(LogProcessor.NEW_BUYER, (_, buyer: Buyer) => {
+    const array_lenght = Buyers.push(buyer);
+    buyer.id = array_lenght - 1;
+    Buyers[array_lenght - 1].id = array_lenght;
+
     lastBuyerName = buyer.playername;
     window?.showInactive();
-    window?.webContents.send('commerce-newbuyer', buyer);
+    window?.webContents.send(Commerce.PUSH_BUYER, buyer);
   });
 
-  ipcMain.on(
-    'clientlog-updatebuyer',
-    (_, playername: string, buyer: Partial<BUYER>) => {
-      console.log('clientlog-updatebuyer');
-      console.log(buyer);
-      window?.showInactive();
-      window?.webContents.send('commerce-updatebuyer', playername, buyer);
-    }
-  );
+  ipcMain.on(LogProcessor.PLAYER_ARRIVAL, (_, playername: string) => {
+    Buyers.filter((b) => b.playername == playername).forEach((buyer) => {
+      buyer.playerIsHere = true;
+      buyer.currentAction = 'trade';
+      window?.webContents.send(Commerce.UPDATE_BUYER, buyer.id, buyer);
+    });
+  });
+
+  ipcMain.on(LogProcessor.PLAYER_DEPARTURE, (_, playername: string) => {
+    Buyers.filter((b) => b.playername == playername).forEach((buyer) => {
+      buyer.playerIsHere = false;
+      buyer.currentAction = 'kick';
+      window?.webContents.send(Commerce.UPDATE_BUYER, buyer.id, buyer);
+    });
+  });
 
   ipcMain.on('commerce-buyer', (_, buyerNum) => {
     console.log('commerce-buyer: ', buyerNum);
   });
 
-  //Renderer: remove buyer
-  ipcMain.on('commerce-remove-buyer', (_, buyerId) => {
-    console.log('commerce-remove-buyer: ', buyerId);
-    const index = Buyers.findIndex((buyer) => buyer.id === buyerId);
+  ipcMain.on(Commerce.SPLICE_BUYER, (_, buyerId) => {
+    const index = Buyers.findIndex((b) => b.id === buyerId);
     if (index !== -1) Buyers.splice(index, 1);
+    else console.log("tentative de suppression d'un buyer innexistant");
 
-    //recalcul les index
+    //recalcul les index forEach parcourt toujours du premier au dernier (par index)
     Buyers.forEach((buyer, index) => {
-      if (buyer.customIndex !== index + 1) {
-        window?.webContents.send('commerce-updatebuyer-id', buyer.id, {
-          customIndex: index + 1,
-        });
+      if (buyer.id !== index + 1) {
+        const ancienId = buyer.id;
+        buyer.id = index + 1;
+        window?.webContents.send(Commerce.UPDATE_BUYER, ancienId, buyer);
       }
     });
-  });
-
-  ipcMain.on('commerce-buyer-wait', (_) => {
-    console.log(`commerce-buyer say wait to : ${lastBuyerName}`);
-    ipcMain.emit('saywait-player', {}, lastBuyerName);
   });
 
   //  ipcMain.on('', (_,)=>{})

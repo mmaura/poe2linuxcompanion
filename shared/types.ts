@@ -5,9 +5,8 @@ export interface Message {
   unread: boolean;
 }
 
-export interface BUYER {
-  id: string;
-  customIndex?: Number;
+export interface Buyer {
+  id?: number;
   currentAction: 'invite' | 'hideout' | 'trade' | 'thx' | 'kick';
   date: Date;
   direction: 'buy' | 'sell';

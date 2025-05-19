@@ -1,5 +1,6 @@
 import { ipcRenderer, contextBridge } from 'electron';
-import { BUYER } from '../../shared/types';
+import { Buyer } from '../../shared/types';
+import { Commerce } from '../../shared/ipc-events';
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('ipcRenderer', {
@@ -168,18 +169,18 @@ contextBridge.exposeInMainWorld('configuration', {
  * clientlog
  */
 contextBridge.exposeInMainWorld('commerce', {
-  onNewBuyer: (callback: (buyer: BUYER) => void) => {
-    ipcRenderer.on('commerce-newbuyer', (_, buyer) => callback(buyer));
+  onPushBuyer: (callback: (buyer: Buyer) => void) => {
+    ipcRenderer.on(Commerce.PUSH_BUYER, (_, buyer) => callback(buyer));
   },
   onUpdateBuyer: (
-    callback: (playername: string, updates: Partial<BUYER>) => void
+    callback: (playername: string, updates: Partial<Buyer>) => void
   ) => {
     ipcRenderer.on('commerce-updatebuyer', (_, playername, update) =>
       callback(playername, update)
     );
   },
   onUpdateBuyerId: (
-    callback: (id: string, updates: Partial<BUYER>) => void
+    callback: (id: string, updates: Partial<Buyer>) => void
   ) => {
     ipcRenderer.on('commerce-updatebuyer-id', (_, id, update) =>
       callback(id, update)

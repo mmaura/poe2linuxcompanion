@@ -5,6 +5,7 @@ import readline from 'node:readline';
 import AppStorage from './storage';
 
 import { createLogProcessors } from './logprocessor';
+import { ClientLog } from '../../../shared/ipc-events';
 
 export async function Setup() {
   const lang = app.getLocale().toLowerCase();
@@ -21,8 +22,6 @@ export async function Setup() {
   }
 
   const stats: fs.Stats = fs.statSync(logFilePath);
-
-  //let lastSize = 0;
   let lastSize: number = stats.size;
 
   chokidar
@@ -31,9 +30,10 @@ export async function Setup() {
       awaitWriteFinish: true,
       ignoreInitial: true,
     })
-    .on('add', () => {
+    /*    .on('add', () => {
       // Do nothing on initial add
     })
+      */
     .on('change', () => {
       try {
         const stats: fs.Stats = fs.statSync(logFilePath);
@@ -55,7 +55,7 @@ export async function Setup() {
           });
 
           rl.on('line', (line: string) => {
-            ipcMain.emit('log-line', {}, line);
+            ipcMain.emit(ClientLog.NEW_LOG_LINE, {}, line);
           });
 
           rl.on('close', () => {
@@ -73,37 +73,9 @@ export async function Setup() {
       console.log('Initial scan complete. Ready for changes.');
     });
 
-  /*        chokidar
-    .watch(logFilePath, { persistent: true, awaitWriteFinish: true })
-    .on('change', () => {
-      const stats = fs.statSync(logFilePath);
-      if (stats.size < lastSize) {
-        // log file rotated
-        lastSize = 0;
-      }
+  console.log(`✅ Surveillance du client log :\n${logFilePath}`);
 
-      const stream = fs.createReadStream(logFilePath, {
-        start: lastSize,
-        end: stats.size,
-        encoding: 'utf-8',
-      });
-
-      const rl = readline.createInterface({ input: stream });
-
-      rl.on('line', (line) => {
-        ipcMain.emit('log-line', {}, line);
-      });
-
-      rl.on('close', () => {
-        lastSize = stats.size;
-      });
-    });
-*/
-  console.log(`🕵️ Surveillance de ${logFilePath} démarrée.`);
-
-  ipcMain.on('log-line', async (_, line: string) => {
-    //    console.log('on-line');
-
+  ipcMain.on(ClientLog.NEW_LOG_LINE, async (_, line: string) => {
     try {
       for (const processor of logProcessors) {
         if (processor.regex.test(line)) {

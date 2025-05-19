@@ -1,14 +1,19 @@
 import { exec } from 'child_process';
 import { ipcMain } from 'electron';
 import { promisify } from 'util';
+import { GameCommands } from '../../../shared/ipc-events';
 
 const execAsync = promisify(exec);
 
 export async function Setup() {
-  ipcMain.on('invite-player', (_, playername) => {
+  /**
+   * Register Events
+   *
+   * */
+  ipcMain.on(GameCommands.INVITE, (_, playername) => {
     TypePoe2Message(`/invite ${playername}`);
   });
-  ipcMain.on('exchange-player', (_, playername) => {
+  ipcMain.on(GameCommands.TRADE, (_, playername) => {
     TypePoe2Message(`/tradewith ${playername}`);
   });
 

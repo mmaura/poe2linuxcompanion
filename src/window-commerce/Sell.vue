@@ -7,7 +7,7 @@
     }"
   >
     <div class="number">
-      <p>{{ buyer.customIndex }}</p>
+      <p>{{ buyer.id }}</p>
     </div>
     <div>
       <audio id="notificationSound" :src="notifSoundFile"></audio>
@@ -129,7 +129,9 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue';
-import { BUYER } from '../../shared/types';
+import { Buyer } from '../../shared/types';
+import { GameCommands } from '../../shared/ipc-events';
+
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import alchIcon from '@/assets/currency/39px-Orb_of_Alchemy_inventory_icon.png';
 import regalIcon from '@/assets/currency/39px-Orb_of_Alchemy_inventory_icon.png';
@@ -137,10 +139,9 @@ import defaultNofifSound from '@/assets/sound/notification.mp3';
 
 const img = ref('');
 const tempsEcoule = ref('');
-//const unreadMsg = ref(false);
 const notifSoundFile = ref(defaultNofifSound);
 const props = defineProps<{
-  buyer: BUYER;
+  buyer: Buyer;
 }>();
 
 switch (props.buyer.price.currency) {
@@ -153,34 +154,37 @@ switch (props.buyer.price.currency) {
 }
 
 function Invite() {
-  window.ipcRenderer.send('invite-player', props.buyer.playername);
+  window.ipcRenderer.send(GameCommands.INVITE, props.buyer.playername);
 }
 
 function Exchange() {
-  window.ipcRenderer.send('exchange-player', props.buyer.playername);
+  window.ipcRenderer.send(GameCommands.TRADE, props.buyer.playername);
 }
 
 function SayThx() {
-  window.ipcRenderer.send('saythx-player', props.buyer.playername);
+  window.ipcRenderer.send(GameCommands.SAY_THX, props.buyer.playername);
   const destroySelf = () => {
     emit('destroy', props.buyer.id); // Émet un événement avec l'ID de l'acheteur
   };
 }
 
 function Ungroup() {
-  window.ipcRenderer.send('ungroup-player', props.buyer.playername);
+  window.ipcRenderer.send(GameCommands.KICK, props.buyer.playername);
 }
 
 function SayWait() {
-  window.ipcRenderer.send('saywait-player', props.buyer.playername);
+  window.ipcRenderer.send(GameCommands.SAY_WAIT, props.buyer.playername);
 }
 
 function ToPlayerHideout() {
-  window.ipcRenderer.send('gotohideout-player', props.buyer.playername);
+  window.ipcRenderer.send(
+    GameCommands.TO_PLAYER_HIDEOUT,
+    props.buyer.playername
+  );
 }
 
 function ReturnHideout() {
-  window.ipcRenderer.send('returnhideout-player');
+  window.ipcRenderer.send(GameCommands.HIDEOUT);
 }
 
 const emit = defineEmits(['destroy']);

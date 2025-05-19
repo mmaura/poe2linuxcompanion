@@ -1,5 +1,6 @@
 import { ipcMain } from 'electron';
-import { BUYER } from '../../../shared/types';
+import { Buyer } from '../../../shared/types';
+import { ClientLog, LogProcessor } from '../../../shared/ipc-events';
 
 const Map = {
   fr: {
@@ -33,10 +34,10 @@ const Map = {
 export const createLogProcessors = (lang: string) => {
   const currentLangMap = Map[lang] ?? Map['fr'];
 
-  ipcMain.on('clientlog-test1', async () => {
+  ipcMain.on(LogProcessor.RUN_TEST1, async () => {
     console.log('test1');
     for (const value of Test1[lang]) {
-      ipcMain.emit('log-line', {}, value); // ipcMain.emit('channel', event, ...args)
+      ipcMain.emit(ClientLog.NEW_LOG_LINE, {}, value); // ipcMain.emit('channel', event, ...args)
       await new Promise((resolve) => setTimeout(resolve, 1000)); // pause de 1000 ms
     }
   });
@@ -69,8 +70,7 @@ export const createLogProcessors = (lang: string) => {
             ypos,
           ] = buyerResult;
 
-          const buyer: BUYER = {
-            id: `${playername}-${objet}`,
+          const buyer: Buyer = {
             currentAction: 'invite',
             date: new Date(date),
             direction: 'sell',
@@ -87,7 +87,7 @@ export const createLogProcessors = (lang: string) => {
             ypos: Number(ypos),
             messages: [],
           };
-          ipcMain.emit('clientlog-newbuyer', {}, buyer); // ipcMain.emit('channel', event, ...args)
+          ipcMain.emit(LogProcessor.NEW_BUYER, {}, buyer); // ipcMain.emit('channel', event, ...args)
         }
       },
     },
@@ -99,10 +99,7 @@ export const createLogProcessors = (lang: string) => {
         //Player arrive
         if (arrivalResult) {
           const [, date, playername] = arrivalResult;
-          ipcMain.emit('clientlog-updatebuyer', {}, playername, {
-            playerIsHere: true,
-            currentAction: 'trade',
-          }); // ipcMain.emit('channel', event, ...args)
+          ipcMain.emit(LogProcessor.PLAYER_ARRIVAL, {}, playername); // ipcMain.emit('channel', event, ...args)
         }
       },
     },
@@ -114,15 +111,13 @@ export const createLogProcessors = (lang: string) => {
         //Player part
         if (departureResult) {
           const [, date, playername] = departureResult;
-          ipcMain.emit('clientlog-updatebuyer', {}, playername, {
-            playerIsHere: false,
-            currentAction: 'kick',
-          });
+          ipcMain.emit(LogProcessor.PLAYER_DEPARTURE, {}, playername);
         }
       },
     },
   ];
 };
+
 const Test1 = {
   fr: [
     '2025/05/01 16:05:12 311884 3ef23365 [INFO Client 188] @De Player1: Bonjour, je souhaiterais t\'acheter La Sentinelle, Bâton de combat gothique pour 1 alch dans la ligue Dawn of the Hunt (onglet de réserve "V1" ; 3e en partant de la gauche, 1e en partant du haut)',

@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+//import { Buyer } from '../shared/types';
 
 declare module '*.vue' {
   import type { DefineComponent } from 'vue';
@@ -30,10 +31,9 @@ interface Window {
   };
 
   commerce: {
-    onNewBuyer: (callback: (buyer: BUYER) => void) => void;
-
+    onPushBuyer: (callback: (buyer: Buyer) => void) => void;
     onUpdateBuyer: (
-      callback: (playername: string, updates: Partial<BUYER>) => void
+      callback: (playername: string, updates: Partial<Buyer>) => void
     ) => void;
   };
 }
