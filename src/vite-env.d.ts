@@ -33,7 +33,7 @@ interface Window {
   commerce: {
     onPushBuyer: (callback: (buyer: Buyer) => void) => void;
     onUpdateBuyer: (
-      callback: (playername: string, updates: Partial<Buyer>) => void
+      callback: (id: number, updates: Partial<Buyer>) => void
     ) => void;
   };
 }

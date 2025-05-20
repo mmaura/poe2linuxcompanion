@@ -3,6 +3,7 @@ import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 import fs from 'node:fs';
+import { Commerce, Sidekick } from '../../../shared/ipc-events';
 
 export async function Setup(
   socketPath: string = path.join(
@@ -18,7 +19,6 @@ export async function Setup(
 
   server = net.createServer((stream) => {
     stream.on('data', (data) => {
-      //TODO: traiter les messages recu sur la socket
       const command = data.toString().split('\n');
 
       switch (command[0]) {
@@ -27,33 +27,15 @@ export async function Setup(
           break;
         //check price
         case 'pricecheck':
-          console.log('pricecheck');
-          ipcMain.emit('pricecheck-checkitem', ...command);
+          ipcMain.emit(Sidekick.CHECK_ITEM, ...command);
           break;
-        //do the next action for buyer 1 (invite => /hideout => trade => kick)
-        case 'buyer1':
-          console.log('buyer1');
-          ipcMain.emit('commerce-buyer', '1');
-          break;
-        //do the next action for buyer 1 (invite => /hideout => trade => kick)
-        case 'buyer2':
-          console.log('buyer2');
-          ipcMain.emit('commerce-buyer', '2');
-          break;
-        //do the next action for buyer 1 (invite => /hideout => trade => kick)
-        case 'buyer1':
-          console.log('buyer3');
-          ipcMain.emit('commerce-buyer', '3');
-          break;
-        //do the next action for buyer 1 (invite => /hideout => trade => kick)
-        case 'buyer1':
-          console.log('buyer4');
-          ipcMain.emit('commerce-buyer', '4');
+        //do the next action for buyer x (invite => trade => kick)
+        case 'buyer-next-command':
+          ipcMain.emit(Commerce.BUYER_NEXT_ACTION, {}, command[1]);
           break;
         //say wait to the last buyer
         case 'buyer-wait':
-          console.log('buyer-wait');
-          ipcMain.emit('commerce-buyer-wait', {});
+          ipcMain.emit(Commerce.LAST_WISPER_WAIT, {});
           break;
         default:
           console.log('commande inconnue');

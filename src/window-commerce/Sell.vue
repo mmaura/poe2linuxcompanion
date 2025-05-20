@@ -118,7 +118,7 @@
         <div class="separator"></div>
         <div class="separator"></div>
         <button
-          title="Fermer"
+          :title="`Fermer ${buyer.id}`"
           class="fa-solid fa-xmark"
           @click="destroySelf()"
         ></button>

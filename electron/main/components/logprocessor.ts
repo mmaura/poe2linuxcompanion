@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import { Buyer } from '../../../shared/types';
+import { Buyer, Message } from '../../../shared/types';
 import { ClientLog, LogProcessor } from '../../../shared/ipc-events';
 
 const Map = {
@@ -15,6 +15,13 @@ const Map = {
       `(\\S+): ` +
       `Bonjour, je souhaiterais t'acheter (.+?) pour ([0-9]+) (.+?) dans la ligue (.+?) ` +
       `\\(onglet de réserve "(.*?)" ; ([0-9]+)e en partant de la gauche, ([0-9]+)e en partant du haut\\)`,
+    WispMsg:
+      `([0-9]{4}/[0-9]{2}/[0-9]{2} ?[0-9]{2}:[0-9]{2}:[0-9]{2}) ` + // Date/heure
+      `[0-9]+ [a-z0-9]+ ` + // ces deux blocs : "311884 3ef23365"
+      `\\[INFO Client [0-9]+\\] ` + // tag
+      `@(De|À) ` + // "De" ou "À"
+      `(?:<(\\S+)> )?` + // pseudo optionnel
+      `(\\S+): (.*)`,
     playerArrival:
       `([0-9]{4}/[0-9]{2}/[0-9]{2} ?[0-9]{2}:[0-9]{2}:[0-9]{2}) ` + // Date/heure
       `[0-9]+ [a-z0-9]+ ` +
@@ -35,7 +42,6 @@ export const createLogProcessors = (lang: string) => {
   const currentLangMap = Map[lang] ?? Map['fr'];
 
   ipcMain.on(LogProcessor.RUN_TEST1, async () => {
-    console.log('test1');
     for (const value of Test1[lang]) {
       ipcMain.emit(ClientLog.NEW_LOG_LINE, {}, value); // ipcMain.emit('channel', event, ...args)
       await new Promise((resolve) => setTimeout(resolve, 1000)); // pause de 1000 ms
@@ -85,9 +91,32 @@ export const createLogProcessors = (lang: string) => {
             tab: tab,
             xpos: Number(xpos),
             ypos: Number(ypos),
-            messages: [],
+            messages: [
+              /* {
+                date: new Date(date),
+                direction: direction == currentLangMap.from ? 'from' : 'to',
+                message: msg,
+              },
+             */
+            ],
           };
           ipcMain.emit(LogProcessor.NEW_BUYER, {}, buyer); // ipcMain.emit('channel', event, ...args)
+        }
+      },
+    },
+    {
+      //Wisp
+      regex: wispRegExp,
+      process: (line: string) => {
+        const wispResult = wispRegExp.exec(line);
+        if (wispResult) {
+          const [, date, direction, optionalNick, playername, msg] = wispResult;
+          let message: Message = {
+            date: new Date(date),
+            direction: direction == currentLangMap.from ? 'from' : 'to',
+            message: msg,
+          };
+          ipcMain.emit(LogProcessor.WISP, {}, playername, message);
         }
       },
     },
@@ -99,7 +128,7 @@ export const createLogProcessors = (lang: string) => {
         //Player arrive
         if (arrivalResult) {
           const [, date, playername] = arrivalResult;
-          ipcMain.emit(LogProcessor.PLAYER_ARRIVAL, {}, playername); // ipcMain.emit('channel', event, ...args)
+          ipcMain.emit(LogProcessor.PLAYER_ARRIVAL, {}, playername, date); // ipcMain.emit('channel', event, ...args)
         }
       },
     },
@@ -111,7 +140,7 @@ export const createLogProcessors = (lang: string) => {
         //Player part
         if (departureResult) {
           const [, date, playername] = departureResult;
-          ipcMain.emit(LogProcessor.PLAYER_DEPARTURE, {}, playername);
+          ipcMain.emit(LogProcessor.PLAYER_DEPARTURE, {}, playername, date);
         }
       },
     },

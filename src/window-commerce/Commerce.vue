@@ -26,19 +26,16 @@ onMounted(() => {
     });
   });
 
-  window.commerce.onUpdateBuyer(
-    (playername: string, updates: Partial<Buyer>) => {
-      console.log(`update: ${playername}`, updates);
-      updateBuyer(playername, updates);
-      nextTick(() => {
-        adjustWindowHeight();
-      });
-    }
-  );
+  window.commerce.onUpdateBuyer((id: number, updates: Partial<Buyer>) => {
+    updateBuyer(id, updates);
+    nextTick(() => {
+      adjustWindowHeight();
+    });
+  });
 });
 
-function updateBuyer(playername: string, updates: Partial<Buyer>) {
-  const buyerIndex = buyers.findIndex((b) => b.playername === playername);
+function updateBuyer(id: number, updates: Partial<Buyer>) {
+  const buyerIndex = buyers.findIndex((b) => b.id === id);
   if (buyerIndex !== -1) {
     Object.assign(buyers[buyerIndex], updates);
     if (updates.messages) {

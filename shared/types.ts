@@ -2,7 +2,7 @@ export interface Message {
   date: Date;
   message: string;
   direction: 'from' | 'to';
-  unread: boolean;
+  unread?: boolean;
 }
 
 export interface Buyer {

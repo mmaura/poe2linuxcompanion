@@ -3,7 +3,7 @@ import { PRELOAD, RENDERER_DIST, VITE_DEV_SERVER_URL } from '../utils';
 import path from 'node:path';
 
 import windowStateKeeper from 'electron-window-state';
-import { Buyer } from '../../../shared/types';
+import { Buyer, Message } from '../../../shared/types';
 import {
   LogProcessor,
   Commerce,
@@ -17,7 +17,7 @@ export async function Setup() {
     defaultHeight: screen.getPrimaryDisplay().workAreaSize.height,
   });
 
-  let lastBuyerName = '';
+  let lastWisper = '';
 
   let Buyers: Buyer[] = [];
 
@@ -31,7 +31,7 @@ export async function Setup() {
     transparent: true,
     frame: false,
     width: WINDOW_WIDTH,
-    height: 1,
+    height: WindowSate.height,
     x: WindowSate.x,
     y: WindowSate.y,
     resizable: false,
@@ -78,7 +78,6 @@ export async function Setup() {
     buyer.id = array_lenght - 1;
     Buyers[array_lenght - 1].id = array_lenght;
 
-    lastBuyerName = buyer.playername;
     window?.showInactive();
     window?.webContents.send(Commerce.PUSH_BUYER, buyer);
   });
@@ -99,8 +98,17 @@ export async function Setup() {
     });
   });
 
-  ipcMain.on('commerce-buyer', (_, buyerNum) => {
-    console.log('commerce-buyer: ', buyerNum);
+  ipcMain.on(LogProcessor.WISP, (_, playername: string, msg: Message) => {
+    let find = false;
+    Buyers.filter((b) => b.playername == playername).forEach((buyer) => {
+      buyer.messages.push(msg);
+      window?.webContents.send(Commerce.UPDATE_BUYER, buyer.id, buyer);
+    });
+    if (find) lastWisper = playername;
+  });
+
+  ipcMain.on(Commerce.LAST_WISPER_WAIT, (_) => {
+    ipcMain.emit(GameCommands.SAY_WAIT, lastWisper);
   });
 
   ipcMain.on(Commerce.SPLICE_BUYER, (_, buyerId) => {
@@ -110,9 +118,10 @@ export async function Setup() {
 
     //recalcul les index forEach parcourt toujours du premier au dernier (par index)
     Buyers.forEach((buyer, index) => {
-      if (buyer.id !== index + 1) {
+      const newId = index + 1;
+      if (buyer.id !== newId) {
         const ancienId = buyer.id;
-        buyer.id = index + 1;
+        buyer.id = newId;
         window?.webContents.send(Commerce.UPDATE_BUYER, ancienId, buyer);
       }
     });

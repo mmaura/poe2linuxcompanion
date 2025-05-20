@@ -172,17 +172,8 @@ contextBridge.exposeInMainWorld('commerce', {
   onPushBuyer: (callback: (buyer: Buyer) => void) => {
     ipcRenderer.on(Commerce.PUSH_BUYER, (_, buyer) => callback(buyer));
   },
-  onUpdateBuyer: (
-    callback: (playername: string, updates: Partial<Buyer>) => void
-  ) => {
-    ipcRenderer.on('commerce-updatebuyer', (_, playername, update) =>
-      callback(playername, update)
-    );
-  },
-  onUpdateBuyerId: (
-    callback: (id: string, updates: Partial<Buyer>) => void
-  ) => {
-    ipcRenderer.on('commerce-updatebuyer-id', (_, id, update) =>
+  onUpdateBuyer: (callback: (id: number, updates: Partial<Buyer>) => void) => {
+    ipcRenderer.on(Commerce.UPDATE_BUYER, (_, id, update) =>
       callback(id, update)
     );
   },
