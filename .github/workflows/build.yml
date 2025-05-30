@@ -29,13 +29,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 20.19.1
+          cache: pnpm
 
       - name: Install Dependencies
-        run: npm install
+        run: pnpm install
 
       - name: Build Release Files
-        run: npm run build
+        run: pnpm build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
