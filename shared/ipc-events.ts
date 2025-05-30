@@ -4,7 +4,15 @@ export const ClientLog = {
 
 export const Sidekick = {
   CHECK_ITEM: 'sidekick:checkItem',
+  INIT: 'sidekick:init',
   CONFIG: 'sidekick:config',
+  SHOW: 'sidekick:showWindow',
+  DEBUG: 'sidekick:debug',
+};
+
+export const Config = {
+  SHOW_CONFIG_FILE: 'storage:showConfigFile',
+  SHOW_CONFIG_WINDOW: 'configuration:showWindow',
 };
 
 export const LogProcessor = {
@@ -12,6 +20,7 @@ export const LogProcessor = {
   NEW_BUYER: 'logprocessor:newBuyer',
   PLAYER_ARRIVAL: 'logprocessor:playerArrival',
   PLAYER_DEPARTURE: 'logprocessor:playerDeparture',
+  EXCHANGE_ACCEPTED: 'logprocessor:exchangeAccepted',
   WISP: 'logprocessor:wisp',
 };
 

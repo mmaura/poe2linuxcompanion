@@ -9,23 +9,24 @@ import {
 import fs from 'node:fs';
 
 import AppStorage from './storage';
+import { Config } from '../../../shared/ipc-events.js';
 
-let Window: BrowserWindow = null;
+let Window: BrowserWindow | null = null;
 
 export async function Setup() {
   //from renderer
-  ipcMain.handle('configuration-show-window', () => {
+  ipcMain.handle(Config.SHOW_CONFIG_WINDOW, () => {
+    ShowConfigWindow();
+  });
+
+  //from main (socket, ...)
+  ipcMain.on(Config.SHOW_CONFIG_WINDOW, () => {
     ShowConfigWindow();
   });
 
   ipcMain.handle('configuration-show-poe2logfiledialog', async (event, arg) =>
     ShowPoe2logFileDialog(arg)
   );
-
-  //from main (socket, ...)
-  ipcMain.on('configuration-show-window', () => {
-    ShowConfigWindow();
-  });
 
   ipcMain.on('configuration-receivePoe2LogFilePath', (event, newPath) => {
     if (newPath && fs.existsSync(newPath)) {
@@ -63,7 +64,7 @@ export async function Setup() {
   });
 }
 
-async function ShowPoe2logFileDialog(arg: string = null) {
+async function ShowPoe2logFileDialog(arg: string | null = null) {
   if (!arg) arg = '';
   const { canceled, filePaths } = await dialog.showOpenDialog({
     title: 'Choisissez un fichier',

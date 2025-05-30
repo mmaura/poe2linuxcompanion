@@ -15,6 +15,7 @@ const WINDOW_WIDTH = 400;
 export async function Setup() {
   const WindowSate = windowStateKeeper({
     defaultHeight: screen.getPrimaryDisplay().workAreaSize.height,
+    file: 'commerce-window-state.json',
   });
 
   let lastWisper = '';
@@ -83,15 +84,22 @@ export async function Setup() {
   });
 
   ipcMain.on(LogProcessor.PLAYER_ARRIVAL, (_, playername: string) => {
-    Buyers.filter((b) => b.playername == playername).forEach((buyer) => {
+    Buyers.filter((b) => b.playername == playername).forEach((buyer: Buyer) => {
       buyer.playerIsHere = true;
       buyer.currentAction = 'trade';
       window?.webContents.send(Commerce.UPDATE_BUYER, buyer.id, buyer);
     });
   });
 
+  ipcMain.on(LogProcessor.EXCHANGE_ACCEPTED, (_, playername: string) => {
+    Buyers.filter((b) => b.playername == playername).forEach((buyer: Buyer) => {
+      buyer.currentAction = 'thx';
+      window?.webContents.send(Commerce.UPDATE_BUYER, buyer.id, buyer);
+    });
+  });
+
   ipcMain.on(LogProcessor.PLAYER_DEPARTURE, (_, playername: string) => {
-    Buyers.filter((b) => b.playername == playername).forEach((buyer) => {
+    Buyers.filter((b) => b.playername == playername).forEach((buyer: Buyer) => {
       buyer.playerIsHere = false;
       buyer.currentAction = 'kick';
       window?.webContents.send(Commerce.UPDATE_BUYER, buyer.id, buyer);
@@ -100,7 +108,7 @@ export async function Setup() {
 
   ipcMain.on(LogProcessor.WISP, (_, playername: string, msg: Message) => {
     let find = false;
-    Buyers.filter((b) => b.playername == playername).forEach((buyer) => {
+    Buyers.filter((b) => b.playername == playername).forEach((buyer: Buyer) => {
       buyer.messages.push(msg);
       window?.webContents.send(Commerce.UPDATE_BUYER, buyer.id, buyer);
     });

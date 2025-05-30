@@ -146,9 +146,9 @@ app.whenReady().then(() => {
   //appRegisterShorcuts();
   gamecommandSetup();
 
-  AppStorage.onDidChange('hotkeys', () => {
+  /*   AppStorage.onDidChange('hotkeys', () => {
     appRegisterShorcuts();
-  });
+  }); */
 });
 
 app.on('will-quit', () => {
@@ -188,6 +188,7 @@ ipcMain.on('hide-mainwindow', () => {
  * Utiliser plutot le serveur socket
  */
 
+/*
 async function appRegisterShorcuts() {
   globalShortcut.unregisterAll();
 
@@ -200,3 +201,4 @@ async function appRegisterShorcuts() {
     console.log(`✓ Enregistrement des raccourcis globaux réussi.`);
   } else console.log('⚠️ Enregistrement des raccourcis globaux échoué.');
 }
+*/

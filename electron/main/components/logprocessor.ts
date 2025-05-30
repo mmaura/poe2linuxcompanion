@@ -32,6 +32,11 @@ const Map = {
       `[0-9]+ [a-z0-9]+ ` +
       `\\[INFO Client [0-9]+\\] ` +
       `: (.*) a quitté la zone.`, //playername
+    exchangeAccepted:
+      `([0-9]{4}/[0-9]{2}/[0-9]{2} ?[0-9]{2}:[0-9]{2}:[0-9]{2}) ` + // Date/heure
+      `[0-9]+ [a-z0-9]+ ` +
+      `\\[INFO Client [0-9]+\\] ` +
+      `: Échange accepté.`,
   },
   // 'en': {
   //   lang: 'English',
@@ -79,7 +84,7 @@ export const createLogProcessors = (lang: string) => {
           const buyer: Buyer = {
             currentAction: 'invite',
             date: new Date(date),
-            direction: 'sell',
+            direction: currentLangMap.from ? 'sell' : 'buy',
             playername: playername,
             playerIsHere: false,
             price: {

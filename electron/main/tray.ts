@@ -1,6 +1,6 @@
 import { app, ipcMain, Menu, Tray } from 'electron';
 import { AppIconFile } from './utils';
-import { LogProcessor } from '../../shared/ipc-events';
+import { Config, LogProcessor, Sidekick } from '../../shared/ipc-events';
 let AppTray; //= null;
 
 export async function CreateTray() {
@@ -8,15 +8,21 @@ export async function CreateTray() {
 
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: 'Configuration',
+      label: 'Configuration (partial)',
       click: async () => {
-        ipcMain.emit('configuration-show-window');
+        ipcMain.emit(Config.SHOW_CONFIG_WINDOW);
       },
     },
     {
-      label: 'Sidekick',
+      label: 'Configuration file (complete)',
       click: async () => {
-        ipcMain.emit('sidekick-show-window');
+        ipcMain.emit(Config.SHOW_CONFIG_FILE);
+      },
+    },
+    {
+      label: 'Afficher Sidekick',
+      click: async () => {
+        ipcMain.emit(Sidekick.SHOW);
       },
     },
     {
@@ -42,6 +48,6 @@ export async function CreateTray() {
   AppTray.setContextMenu(contextMenu);
 
   AppTray.on('click', () => {
-    ipcMain.emit('show-mainwindows');
+    ipcMain.emit(Sidekick.SHOW);
   });
 }

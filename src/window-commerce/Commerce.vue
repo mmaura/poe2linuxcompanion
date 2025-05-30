@@ -1,5 +1,7 @@
 <template>
   <div ref="content" class="p-4 overflow-y-auto h-full buyer-container">
+    <audio id="notificationSound" :src="notifSoundFile"></audio>
+
     <template v-for="(buyer, index) in buyers" :key="buyer.id">
       <Sell class="fadein" :buyer="buyer" @destroy="removeBuyer(buyer.id)" />
     </template>
@@ -11,6 +13,8 @@ import { reactive, ref, onMounted, nextTick } from 'vue';
 import { Buyer, Message } from '../../shared/types'; // Importez les deux types
 import Sell from './Sell.vue';
 import { Commerce } from '../../shared/ipc-events';
+import defaultNofifSound from '@/assets/sound/notification.mp3';
+const notifSoundFile = ref(defaultNofifSound);
 
 const buyers = reactive<Buyer[]>([]);
 const content = ref<HTMLElement | null>(null);
@@ -19,6 +23,8 @@ onMounted(() => {
   adjustWindowHeight();
 
   window.commerce.onPushBuyer((buyer: Buyer) => {
+    playNotificationSound();
+
     buyers.push(buyer);
 
     nextTick(() => {
@@ -33,6 +39,15 @@ onMounted(() => {
     });
   });
 });
+
+async function playNotificationSound() {
+  let audio: HTMLAudioElement = document.getElementById(
+    'notificationSound'
+  ) as HTMLAudioElement;
+  audio
+    ?.play()
+    ?.catch((e) => console.error('Erreur lors de la lecture du son:', e));
+}
 
 function updateBuyer(id: number, updates: Partial<Buyer>) {
   const buyerIndex = buyers.findIndex((b) => b.id === id);

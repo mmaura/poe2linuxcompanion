@@ -2,6 +2,9 @@ import Store from 'electron-store';
 import type { Schema } from 'electron-store';
 import path from 'node:path';
 import os from 'node:os';
+import { ipcMain, shell } from 'electron';
+import { Config } from '../../../shared/ipc-events';
+import { exec } from 'node:child_process';
 
 type ConfigSchema = {
   poe2LogFilePath: string;
@@ -19,6 +22,9 @@ type ConfigSchema = {
       reload_logs: 'Ctrl+Alt+R';
     };
   };
+  ntfy_enabled: boolean;
+  ntfy_url: string;
+  ntfy_authorization_bearer: string;
 };
 
 const configSchema: Schema<ConfigSchema> = {
@@ -48,6 +54,18 @@ const configSchema: Schema<ConfigSchema> = {
     type: 'string',
     default: 'http://127.0.0.1:5000',
   },
+  ntfy_enabled: {
+    type: 'boolean',
+    default: false,
+  },
+  ntfy_url: {
+    type: 'string',
+    default: 'https://ntfy.sh/mytopic',
+  },
+  ntfy_authorization_bearer: {
+    type: 'string',
+    default: '123456789....',
+  },
   hotkeys: {
     type: 'object',
     properties: {
@@ -64,3 +82,8 @@ const AppStorage = new Store<ConfigSchema>({
 });
 
 export default AppStorage;
+
+ipcMain.on(Config.SHOW_CONFIG_FILE, async () => {
+  await AppStorage.openInEditor();
+  //shell.openPath(AppStorage.path);
+});

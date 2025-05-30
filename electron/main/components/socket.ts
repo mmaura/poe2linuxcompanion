@@ -31,6 +31,7 @@ export async function Setup(
           break;
         //do the next action for buyer x (invite => trade => kick)
         case 'buyer-next-command':
+          console.log('next command');
           ipcMain.emit(Commerce.BUYER_NEXT_ACTION, {}, command[1]);
           break;
         //say wait to the last buyer

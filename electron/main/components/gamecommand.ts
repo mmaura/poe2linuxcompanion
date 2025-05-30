@@ -11,25 +11,30 @@ export async function Setup() {
    *
    * */
   ipcMain.on(GameCommands.INVITE, (_, playername) => {
+    console.log('commande invite');
     TypePoe2Message(`/invite ${playername}`);
   });
+
   ipcMain.on(GameCommands.TRADE, (_, playername) => {
+    console.log('commande trade');
     TypePoe2Message(`/tradewith ${playername}`);
   });
 
-  ipcMain.on('saythx-player', (_, playername) => {
+  ipcMain.on(GameCommands.SAY_THX, (_, playername) => {
+    console.log('commande say thx');
     TypePoe2Message(`@${playername} Thx glhf !`);
   });
-  ipcMain.on('ungroup-player', (_, playername) => {
+
+  ipcMain.on(GameCommands.KICK, (_, playername) => {
     TypePoe2Message(`/kick ${playername}`);
   });
-  ipcMain.on('saywait-player', (_, playername) => {
+  ipcMain.on(GameCommands.SAY_WAIT, (_, playername) => {
     TypePoe2Message(`@${playername} Plz wait 2 minutes.`);
   });
-  ipcMain.on('gotohideout-player', (_, playername) => {
+  ipcMain.on(GameCommands.TO_PLAYER_HIDEOUT, (_, playername) => {
     TypePoe2Message(`/hideout ${playername}`);
   });
-  ipcMain.on('returnhideout-player', (_) => {
+  ipcMain.on(GameCommands.HIDEOUT, (_) => {
     TypePoe2Message(`/hideout`);
   });
 }

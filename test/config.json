@@ -1,0 +1,9 @@
+{
+	"poe2LogFilePath": "/home/mathieu/Games/path-of-exile-2/drive_c/Program Files (x86)/Grinding Gear Games/Path of Exile 2/logs/Client.txt",
+	"poe2CmdLine": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/6",
+	"Poe2RunAtStart": false,
+	"sidekickURL": "http://192.168.22.117:5500",
+	"hotkeys": {
+		"pricecheck": ""
+	}
+}

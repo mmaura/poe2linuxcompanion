@@ -10,7 +10,6 @@
       <p>{{ buyer.id }}</p>
     </div>
     <div>
-      <audio id="notificationSound" :src="notifSoundFile"></audio>
       <div class="flex-row">
         <div
           class="message-container interactive"
@@ -135,11 +134,9 @@ import { GameCommands } from '../../shared/ipc-events';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import alchIcon from '@/assets/currency/39px-Orb_of_Alchemy_inventory_icon.png';
 import regalIcon from '@/assets/currency/39px-Orb_of_Alchemy_inventory_icon.png';
-import defaultNofifSound from '@/assets/sound/notification.mp3';
 
 const img = ref('');
 const tempsEcoule = ref('');
-const notifSoundFile = ref(defaultNofifSound);
 const props = defineProps<{
   buyer: Buyer;
 }>();
@@ -234,17 +231,8 @@ function formatElapsed(ms: number): string {
 
 let intervalId: number;
 
-function playNotificationSound() {
-  let audio: HTMLAudioElement = document.getElementById(
-    'notificationSound'
-  ) as HTMLAudioElement;
-  audio
-    ?.play()
-    ?.catch((e) => console.error('Erreur lors de la lecture du son:', e));
-}
-
 onMounted(() => {
-  playNotificationSound();
+  //playNotificationSound();
   intervalId = window.setInterval(() => {
     const now = new Date();
     const diff = now.getTime() - new Date(props.buyer.date).getTime();
