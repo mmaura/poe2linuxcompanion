@@ -5,6 +5,7 @@
   "description": "Un companioon pour poe2 sous linux",
   "author": "Mathieu MAURA <mmaura66@gmail.com>",
   "license": "MIT",
+  "packageManager": "pnpm@10.10.0",
   "private": true,
   "keywords": [
     "electron",
