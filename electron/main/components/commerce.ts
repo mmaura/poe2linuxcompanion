@@ -18,7 +18,7 @@ export async function Setup() {
     file: 'commerce-window-state.json',
   });
 
-  let lastWisper = '';
+  let lastBuyer = '';
 
   let Buyers: Buyer[] = [];
 
@@ -78,6 +78,7 @@ export async function Setup() {
     const array_lenght = Buyers.push(buyer);
     buyer.id = array_lenght - 1;
     Buyers[array_lenght - 1].id = array_lenght;
+    lastBuyer = buyer.playername;
 
     window?.showInactive();
     window?.webContents.send(Commerce.PUSH_BUYER, buyer);
@@ -112,11 +113,11 @@ export async function Setup() {
       buyer.messages.push(msg);
       window?.webContents.send(Commerce.UPDATE_BUYER, buyer.id, buyer);
     });
-    if (find) lastWisper = playername;
+    //if (find) lastWisper = playername;
   });
 
   ipcMain.on(Commerce.LAST_WISPER_WAIT, (_) => {
-    ipcMain.emit(GameCommands.SAY_WAIT, lastWisper);
+    ipcMain.emit(GameCommands.SAY_WAIT, lastBuyer);
   });
 
   ipcMain.on(Commerce.SPLICE_BUYER, (_, buyerId) => {
@@ -135,7 +136,24 @@ export async function Setup() {
     });
   });
 
-  //  ipcMain.on('', (_,)=>{})
+  ipcMain.on(Commerce.BUYER_NEXT_ACTION, (_, index: number) => {
+    index--;
+    switch (Buyers[index].currentAction) {
+      case 'invite':
+        ipcMain.emit(GameCommands.INVITE, {}, Buyers[index].playername);
+        break;
+      case 'trade':
+        ipcMain.emit(GameCommands.TRADE, {}, Buyers[index].playername);
+        break;
+      case 'thx':
+        ipcMain.emit(GameCommands.SAY_THX, {}, Buyers[index].playername);
+        break;
+      case 'kick':
+        ipcMain.emit(GameCommands.KICK, {}, Buyers[index].playername);
+        break;
+    }
+    ipcMain.emit(Buyers[index].currentAction, Buyers[index]);
+  });
 
   app.on('will-quit', () => {
     window = null;

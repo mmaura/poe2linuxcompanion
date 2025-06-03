@@ -16,6 +16,7 @@ import { Setup as configSetup } from './components/configuration';
 import { Setup as socketSetup } from './components/socket';
 import { Setup as clientlogSetup } from './components/clientlog';
 import { Setup as commerceSetup } from './components/commerce';
+import { Setup as ntfySetup } from './components/ntfy';
 import { Setup as pricecheckSetup } from './components/sidekick';
 import { Setup as gamecommandSetup } from './components/gamecommand';
 
@@ -139,6 +140,7 @@ app.whenReady().then(() => {
   pricecheckSetup();
   configSetup();
   commerceSetup();
+  ntfySetup();
   socketSetup();
   clientlogSetup();
   CreateTray();

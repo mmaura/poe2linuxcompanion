@@ -10,49 +10,54 @@ export async function Setup() {
     const bearer = AppStorage.get('ntfy_authorization_bearer');
     //const channel = AppStorage.get('ntfy_channel');
 
-    if (enabled)
+    if (enabled) {
       if (!url || !bearer) {
         dialog.showErrorBox('Erreur de configuration', '');
         return;
-      } else return;
+      }
 
-    const request = net.request({
-      method: 'GET',
-      url: url, //'https://api.example.com/data'
-      headers: {
-        Authorization: `Bearer ${bearer}`,
-        Title: `${buyer.playername} : ${buyer.objet} , ${buyer.price}`,
-        Priority: '5',
-        Tags: 'triangular_flag_on_post',
-        Firebase: 'no',
-      },
-    });
-
-    request.on('response', (response) => {
-      console.log(`STATUS: ${response.statusCode}`);
-      console.log(`HEADERS: ${JSON.stringify(response.headers)}`);
-
-      let rawData = '';
-
-      response.on('data', (chunk) => {
-        rawData += chunk;
+      const request = net.request({
+        method: 'POST',
+        url: url, //'https://api.example.com/data'
+        headers: {
+          Authorization: `Bearer ${bearer}`,
+          Title: `vente`,
+          Priority: '5',
+          Tags: 'triangular_flag_on_post',
+          Firebase: 'no',
+        },
       });
 
-      response.on('end', () => {
-        try {
-          console.log(`BODY: ${rawData}`);
-          // const parsedData = JSON.parse(rawData); // Si la réponse est en JSON
-          // console.log('Parsed Data:', parsedData);
-        } catch (e: any) {
-          console.error(`Error parsing data: ${e.message}`);
-        }
+      request.on('response', (response) => {
+        console.log(`STATUS: ${response.statusCode}`);
+        console.log(`HEADERS: ${JSON.stringify(response.headers)}`);
+
+        let rawData = '';
+
+        response.on('data', (chunk) => {
+          rawData += chunk;
+        });
+
+        response.on('end', () => {
+          try {
+            console.log(`BODY: ${rawData}`);
+            // const parsedData = JSON.parse(rawData); // Si la réponse est en JSON
+            // console.log('Parsed Data:', parsedData);
+          } catch (e: any) {
+            console.error(`Error parsing data: ${e.message}`);
+          }
+        });
       });
-    });
 
-    request.on('error', (error) => {
-      console.error(`ERROR: ${JSON.stringify(error)}`);
-    });
+      request.on('error', (error) => {
+        console.error(`ERROR: ${JSON.stringify(error)}`);
+      });
 
-    request.end();
+      request.write(
+        `${buyer.playername} : ${buyer.objet} , ${buyer.price.quantity} x ${buyer.price.currency}`
+      );
+
+      request.end();
+    }
   });
 }
