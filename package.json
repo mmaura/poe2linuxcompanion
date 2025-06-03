@@ -21,7 +21,6 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "rebuild": "electron-rebuild --only=robotjs --arch=$(uname -m) --electron-version=$(electron --version)",
     "build": "vue-tsc --noEmit && vite build && electron-builder",
     "preview": "vite preview"
   },
