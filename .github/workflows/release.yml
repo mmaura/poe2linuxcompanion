@@ -37,10 +37,16 @@ jobs:
           path: release/
           retention-days: 5
 
+      - name: Get AppImage filename
+        id: get_appimage_filename
+        run: |
+          APPIMAGE_FILE=$(ls release/*.AppImage)
+          echo "APPIMAGE_FILE=$APPIMAGE_FILE" >> $GITHUB_ENV
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: release/** # Télécharge tous les fichiers du dossier "release"
+          files: ${{ env.APPIMAGE_FILE }} # Télécharge tous les fichiers du dossier "release"
           draft: false
           prerelease: false
         env:
