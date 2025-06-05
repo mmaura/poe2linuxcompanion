@@ -1,6 +1,6 @@
 {
   "name": "poe2-linux-companion",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "main": "dist-electron/main/index.js",
   "description": "Un companioon pour poe2 sous linux",
   "author": "Mathieu MAURA <mmaura66@gmail.com>",

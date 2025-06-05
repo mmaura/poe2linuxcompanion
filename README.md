@@ -1,4 +1,5 @@
 [![Build](https://github.com/mmaura/poe2linuxcompanion/actions/workflows/build.yml/badge.svg)](https://github.com/mmaura/poe2linuxcompanion/actions/workflows/build.yml)
+[![Release](https://github.com/mmaura/poe2linuxcompanion/actions/workflows/release.yml/badge.svg?event=release)](https://github.com/mmaura/poe2linuxcompanion/actions/workflows/release.yml)
 
 # Poe2 Linux Companion
 
